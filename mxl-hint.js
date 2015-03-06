@@ -199,11 +199,13 @@
 
 
         function addIfFits(hints, compareByName) {
-            for (var i = 0; i < hints.length; i++) {
-                var h = hints[i];
+            if (hints) {
+                for (var i = 0; i < hints.length; i++) {
+                    var h = hints[i];
 
-                if (h.name.toLowerCase().indexOf(start.toLowerCase()) == 0 && notYetFound(h, compareByName)) {
-                    found.push(h);
+                    if (h.name.toLowerCase().indexOf(start.toLowerCase()) == 0 && notYetFound(h, compareByName)) {
+                        found.push(h);
+                    }
                 }
             }
         }
@@ -220,34 +222,26 @@
             return 0;
         }
 
-        var additionalHints = options.additionalHints;
+        var additionalHints = options.additionalHints;        
+        
+        if (context) {
+            addIfFits(contextualKeywords);
+            addIfFits(dateParts());
 
-
-        if (editor.options.mxlMode && editor.options.mxlMode.toLowerCase() === "parameters") {
-            if (context) {
-                addIfFits(additionalHints.customTypes);
-            }
-            else {
-                addIfFits(additionalHints.basicTypes);
-                addIfFits(additionalHints.customTypes);
-                addIfFits(additionalHints.workspaces);
-            }
-        } else {
-            if (context) {
-                addIfFits(contextualKeywords);
-                addIfFits(dateParts());
-
+            if (additionalHints) {
                 addIfFits(additionalHints.memberFunctions);
                 addIfFits(additionalHints.attributes);
                 addIfFits(additionalHints.builtinAttributes);
                 addIfFits(additionalHints.customTypes);
+            }
 
-                addIfFits(getPreviousTokens(editor, start), true);
-            } else {
-                addIfFits(contextualKeywords);
-                addIfFits(nonContextualKeywords);
-                addIfFits(dateParts());
+            addIfFits(getPreviousTokens(editor, start), true);
+        } else {
+            addIfFits(contextualKeywords);
+            addIfFits(nonContextualKeywords);
+            addIfFits(dateParts());
 
+            if (additionalHints) {
                 addIfFits(additionalHints.memberFunctions);
                 addIfFits(additionalHints.attributes);
                 addIfFits(additionalHints.builtinAttributes);
@@ -257,10 +251,11 @@
                 addIfFits(additionalHints.basicTypes);
                 addIfFits(additionalHints.customTypes);
                 addIfFits(additionalHints.workspaces);
-
-                addIfFits(getPreviousTokens(editor, start), true);
             }
+
+            addIfFits(getPreviousTokens(editor, start), true);
         }
+
         found.sort(compareNames);
 
         return found;

@@ -1,23 +1,17 @@
 ﻿angular.module('mxl', ['ui.codemirror'])
-.directive('mxlExpression', function ($timeout, uiCodemirrorConfig, scService) {
+.directive('mxlExpression', function ($timeout, uiCodemirrorConfig) {
     return {
         restrict: 'E',
         require: ["^ngModel"],
         scope:
             {
                 expression: '=ngModel',
-                workspace: '@scWorkspace',
-                lineNumbers: '@scLinenumbers',
-                thisType: '@scTypeofthis',
-                parameters: '@scParameters',
-                enableTest: '@scEnabletest',
-                mxlMode: '@scMxlmode'
+                lineNumbers: '@mxlLinenumbers',
+                additionalAutoCompletionHints: '=mxlAutocompletionhints',
+                runTest: '&mxlRuntest',
+                validate: '&mxlValidate'
             },
-        controller: function ($scope) {
-            $scope.testExpression = function () {
-                alert($scope.expression);
-            };
-            
+        controller: function ($scope) {    
             uiCodemirrorConfig.codemirror = {
                 lineWrapping: true,
                 matchBrackets: true,
@@ -27,7 +21,6 @@
                 lineNumbers: $scope.lineNumbers && $scope.lineNumbers === "true",
                 mode: 'mxl',
                 debounce: 2000,
-                mxlMode: $scope.mxlMode,
                 theme: 'mxl',
                 extraKeys: angular.extend({
                     "Ctrl-Space": "autocomplete",
@@ -40,31 +33,24 @@
                     "esc": function (cm) {
                         return CodeMirror.Pass;
                     }
-                }, ($scope.enableTest && $scope.enableTest === 'true') ? { "F9": $scope.testExpression } : {})
+                }, ($scope.runTest) ? {
+                    "F9": function (cm) {
+                        return $scope.runTest();
+                    }
+                } : {})
             };
-                        
-            scService.getAutoCompletionHints($scope.workspace).then(function (autoCompletionHints) {
-                CodeMirror.commands.autocomplete = function (cmeditor) {
-                    CodeMirror.showHint(cmeditor, CodeMirror.hint.mxl, { completeSingle: false, additionalHints: autoCompletionHints });
-                };
-            });
 
-            /*
-            $scope.mxlCursorCol = 1;
+            CodeMirror.commands.autocomplete = function (cmeditor) {
+                var autoCompletionOptions = { completeSingle: false };
 
-            $scope.codeMirrorLoaded = function (cmeditor) {
+                if ($scope.additionalAutoCompletionHints) {
+                    autoCompletionOptions.additionalHints = $scope.additionalAutoCompletionHints;
+                }
 
-                $timeout(function () {
-                    cmeditor.on('cursorActivity', function () {
-                        $scope.$apply(function () {
-                            var pos = cmeditor.getCursor();
-                            $scope.mxlCursorCol = pos.ch + 1;
-                        });
-                    });
-                }, 0, false);
-            }*/
+                CodeMirror.showHint(cmeditor, CodeMirror.hint.mxl, autoCompletionOptions);
+            };
 
         },
-        templateUrl: 'sc/mxl/sc-mxl.html'
+        templateUrl: 'mxl/mxl-template.html'
     }
 });
