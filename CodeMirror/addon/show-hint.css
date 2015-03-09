@@ -7,34 +7,6 @@
 }
 
 
-.CodeMirror-hintHelp {
-    width: 370px;
-    float: right;
-    padding: 1em 0 1em 1em;
-    max-height: 20em;
-    overflow-y: auto;
-}
-
-.CodeMirror-hintsDialog {
-    position: absolute;
-    z-index: 5000;
-    overflow: hidden;
-    -webkit-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-    -moz-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-    box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-    border-radius: 3px;
-    border: 1px solid silver;
-    background: white;
-    font-size: 90%;
-    font-family: monospace;
-    max-height: 23em;
-    width: 600px;
-}
-
-    .CodeMirror-hintsDialog h4 {
-        font-size:120%;
-        font-weight:bold;
-    }
 
 li.CodeMirror-hint {
     margin: 0;
