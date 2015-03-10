@@ -177,7 +177,7 @@ angular.module('mxl', [])
                         if (cm.getOption("fullScreen")) {
                             cm.setOption("fullScreen", false);
                         }
-                        removeCurrentTestPanel();
+                        removeCurrentTestPanel();                        
                         return CodeMirror.Pass;
                     }
                 }
@@ -185,12 +185,16 @@ angular.module('mxl', [])
 
             if ($scope.validateMxl) {
                 codemirrorOptions.validateMxl = function (modelValue, viewValue) {
-                    return $q.when($scope.validateMxl({ modelValue: modelValue, viewValue: viewValue }))
+                    var def = $q.defer();
+                    $q.when($scope.validateMxl({ modelValue: modelValue, viewValue: viewValue }))
                         .then(function (response) {
                             updateLints(null);
+                            def.resolve();
                         }, function (response) {
                             updateLints(response.data);
+                            def.reject();
                         });
+                    return def.promise;
                 };
             }
 
