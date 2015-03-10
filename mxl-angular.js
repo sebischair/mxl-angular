@@ -72,7 +72,7 @@ angular.module('mxl', [])
                     content.innerHTML = "<b>Test result:</b><br/>"
                     content.innerHTML += "" + result.data;
                 }
-                
+
                 if ($scope.testResultWidget) {
                     $scope.testResultWidget.clear();
                 }
