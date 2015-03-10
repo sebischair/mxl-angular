@@ -178,7 +178,6 @@ angular.module('mxl', [])
                             cm.setOption("fullScreen", false);
                         }
                         removeCurrentTestPanel();
-                        updateLints(null);
                         return CodeMirror.Pass;
                     }
                 }
