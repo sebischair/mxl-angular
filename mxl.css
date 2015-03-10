@@ -4,20 +4,6 @@
     border: 1px solid #eee;
 }
 
-.mxl-cursorpositionbox {
-    border-right: 1px solid #ddd;
-    background-color: #f7f7f7;
-    white-space: nowrap;
-    background-color: #FFCCFF;
-    padding: 0 3px 0 5px;
-    width: 20px;
-    text-align: right;
-    color: #999;
-    -moz-box-sizing: content-box;
-    box-sizing: content-box;
-}
-
-
 .CodeMirror-hintHelp {
     width: 370px;
     float: right;
@@ -39,12 +25,12 @@
     font-size: 90%;
     max-height: 23em;
     width: 600px;
-    font-family:monospace;
+    font-family: monospace;
 }
 
     .CodeMirror-hintsDialog h4 {
-        font-size:120%;
-        font-weight:bold;
+        font-size: 120%;
+        font-weight: bold;
     }
 
 .cm-s-mxl span.cm-meta {
@@ -127,3 +113,47 @@
     border: 1px solid grey;
     color: black !important;
 }
+
+.CodeMirror-focused .cm-matchhighlight {
+    font-weight: bold;
+    background-color: #e5e5e5;
+}
+
+.mxl-result-panel {
+    border-bottom: 1px solid #dd6;
+    padding: 5px;
+}
+
+    .mxl-result-panel.success {
+        background-color: #c5f2c5;
+    }
+
+    .mxl-result-panel.error {
+        background-color: #f5e77d;
+    }
+
+.mxl-result-panel-close {
+    float: right;
+    margin-right: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    .mxl-result-panel-close:before {
+        background: transparent;
+        border-radius: 3px;
+        color: #bbb;
+        content: '\00D7';
+        font-weight: 400;
+        height:26px;
+        font-size:26px;
+        top:-10px;
+        text-align: center;
+        position:relative;
+        width: 30px;
+    }
+
+    .mxl-result-panel-close:hover:before,
+    .mxl-result-panel-close:active:before {
+        color: #777;
+    }

@@ -32,7 +32,7 @@
                 from: CodeMirror.Pos(range.fromLine, range.fromCol),
                 to: CodeMirror.Pos(range.toLine, range.toCol),
                 message: currentError.message,
-                severity: "error"
+                severity: currentError.cause === "MxLEvaluationException" ? "warning" : "error"
             });
         }
 

@@ -189,6 +189,7 @@
       var gutters = cm.getOption("gutters"), hasLintGutter = false;
       for (var i = 0; i < gutters.length; ++i) if (gutters[i] == GUTTER_ID) hasLintGutter = true;
       var state = cm.state.lint = new LintState(cm, parseOptions(cm, val), hasLintGutter);
+      
       cm.options.updateMxLLints = onChange;
       //cm.on("change", onChange);
       if (state.options.tooltips != false)
