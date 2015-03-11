@@ -198,8 +198,8 @@
         }
 
 
-        function addIfFits(hints, compareByName) {
-            if (hints) {
+        function addIfFits(hints, alwaysAdd, compareByName) {
+            if (hints && (!editor.options.onlyLimitedHints || alwaysAdd)) {
                 for (var i = 0; i < hints.length; i++) {
                     var h = hints[i];
 
@@ -222,21 +222,24 @@
             return 0;
         }
 
-        var additionalHints = options.additionalHints;        
-        
+        var additionalHints = editor.options.additionalAutoCompletionHints;
+
         if (context) {
+
             addIfFits(contextualKeywords);
             addIfFits(dateParts());
 
             if (additionalHints) {
+                addIfFits(additionalHints.customTypes, true);
                 addIfFits(additionalHints.memberFunctions);
                 addIfFits(additionalHints.attributes);
                 addIfFits(additionalHints.builtinAttributes);
-                addIfFits(additionalHints.customTypes);
             }
 
-            addIfFits(getPreviousTokens(editor, start), true);
+            addIfFits(getPreviousTokens(editor, start), false, true);
+
         } else {
+
             addIfFits(contextualKeywords);
             addIfFits(nonContextualKeywords);
             addIfFits(dateParts());
@@ -247,13 +250,13 @@
                 addIfFits(additionalHints.builtinAttributes);
 
                 addIfFits(additionalHints.staticFunctions);
+                addIfFits(additionalHints.basicTypes, true);
+                addIfFits(additionalHints.customTypes, true);
+                addIfFits(additionalHints.workspaces, true);
                 addIfFits(additionalHints.globalIdentifiers);
-                addIfFits(additionalHints.basicTypes);
-                addIfFits(additionalHints.customTypes);
-                addIfFits(additionalHints.workspaces);
             }
 
-            addIfFits(getPreviousTokens(editor, start), true);
+            addIfFits(getPreviousTokens(editor, start), false, true);
         }
 
         found.sort(compareNames);

@@ -1,7 +1,12 @@
 ﻿'use strict';
 
 angular.module('mxl', [])
-.directive('mxlExpression', function ($timeout, $q) {
+.constant("mxlModes", {
+    expression: "expression",
+    type: "type",
+    parameteres: "parameters"
+})
+.directive('mxlExpression', function ($timeout, $q, mxlModes) {
     return {
         restrict: 'E',
         require: ["^ngModel"],
@@ -11,8 +16,9 @@ angular.module('mxl', [])
                 lineNumbers: '@mxlLinenumbers',
                 readOnly: '@mxlReadonly',
                 debounce: '@mxlDebounce',
-                additionalAutoCompletionHints: '=mxlAutocompletionhints',
+                additionalHints: '=mxlAutocompletionhints',
                 runTest: '&mxlRuntest',
+                mode: '@mxlMode',
                 validateMxl: '&mxlValidate'
             },
         link: function ($scope, $element, $attrs, ctrl) {
@@ -26,13 +32,26 @@ angular.module('mxl', [])
                 return codemirror;
             }
 
-            function normalizeScopeValue() {
-                $scope.lineNumbers = $scope.$eval($scope.lineNumbers);
+            function normalizeScopeValues() {
+                if ($scope.mode) {
+                    if ($scope.mode.toLowerCase() == mxlModes.type) {
+                        $scope.mode = mxlModes.type;
+                    } else if ($scope.mode.toLowerCase() == mxlModes.parameteres) {
+                        $scope.mode = mxlModes.parameteres;
+                    } else {
+                        $scope.mode = mxlModes.expression;
+                    }
+                } else {
+                    $scope.mode = mxlModes.expression;
+                }
+
+                $scope.lineNumbers = $scope.$eval($scope.lineNumbers) && $scope.mode == mxlModes.expression;
                 $scope.readOnly = $scope.$eval($scope.readOnly);
                 if (!$attrs.mxlValidate) {
                     $scope.validateMxl = null;
                 }
-                if (!$attrs.mxlRuntest || $scope.readOnly) {
+                
+                if (!$attrs.mxlRuntest || $scope.readOnly || $scope.mode != mxlModes.expression) {
                     $scope.runTest = null;
                 }
             }
@@ -70,7 +89,7 @@ angular.module('mxl', [])
                 } else {
                     node.className += " success";
                     content.innerHTML = "<b>Test result:</b><br/>"
-                    content.innerHTML += "" + result.data;
+                    content.innerHTML += "" + result.data.value;
                 }
 
                 if ($scope.testResultWidget) {
@@ -97,6 +116,10 @@ angular.module('mxl', [])
                 };
 
                 ctrl.$asyncValidators.typeChecking = function (modelValue, viewValue) {
+                    if (viewValue.trim() === "") {
+                        return $q.when();
+                    }
+
                     if (codemirror.options.validateMxl) {
                         return codemirror.options.validateMxl(modelValue, viewValue);
                     }
@@ -146,7 +169,7 @@ angular.module('mxl', [])
                 });
             }
 
-            normalizeScopeValue();
+            normalizeScopeValues();
 
             var codemirrorOptions = {
                 lineWrapping: true,
@@ -159,6 +182,7 @@ angular.module('mxl', [])
                 mode: 'mxl',
                 gutters: ["CodeMirror-lint-markers"],
                 lint: true,
+                onlyLimitedHints: $scope.mode !== mxlModes.expression,
                 debounce: $scope.debounce ? $scope.debounce : 2000,
                 theme: 'mxl',
                 extraKeys: {
@@ -208,6 +232,8 @@ angular.module('mxl', [])
                     });
                 }
             }
+
+            
             $scope.codemirror = newCodemirrorEditor($element, codemirrorOptions);
 
             configNgModelLink($scope.codemirror, ctrl[0], $scope);
@@ -215,8 +241,8 @@ angular.module('mxl', [])
             CodeMirror.commands.autocomplete = function (cmeditor) {
                 var autoCompletionOptions = { completeSingle: false };
 
-                if ($scope.additionalAutoCompletionHints) {
-                    autoCompletionOptions.additionalHints = $scope.additionalAutoCompletionHints;
+                if ($scope.additionalHints) {
+                    cmeditor.options.additionalAutoCompletionHints = $scope.additionalHints;
                 }
 
                 CodeMirror.showHint(cmeditor, CodeMirror.hint.mxl, autoCompletionOptions);
