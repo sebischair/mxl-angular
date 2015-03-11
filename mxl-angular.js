@@ -63,7 +63,7 @@ angular.module('mxl', [])
                 var content = node.appendChild(document.createElement("span"));
 
                 if (result.status >= 400) {
-                    content.innerHTML = "<b>Error:</b><br/>"
+                    content.innerHTML = "<b>" + (result.data.cause ? result.data.cause : "Error") + "</b><br/>"
                     content.innerHTML += result.data.message;
                     node.className += " error";
                     updateLints(result.data);
@@ -106,6 +106,7 @@ angular.module('mxl', [])
                 codemirror.cancelDebouncedUpdate = function () {
                     if ($scope.debounceUpdate) {
                         $timeout.cancel($scope.debounceUpdate);
+                        $scope.debounceUpdate = null;
                     }
                 }
 
@@ -126,15 +127,13 @@ angular.module('mxl', [])
                     if (newValue !== ctrl.$viewValue) {
                         if (codemirror.options.debounce) {
                             codemirror.cancelDebouncedUpdate();
-
                             $scope.$evalAsync(function () {
                                 $scope.debounceUpdate = $timeout(function () {
-                                    ctrl.$setViewValue(newValue);
+                                    ctrl.$setViewValue(instance.getValue());
                                 }, codemirror.options.debounce);
                             });
                         }
                         else {
-
                             $scope.$evalAsync(function () {
                                 ctrl.$setViewValue(newValue);
                             });
@@ -177,7 +176,7 @@ angular.module('mxl', [])
                         if (cm.getOption("fullScreen")) {
                             cm.setOption("fullScreen", false);
                         }
-                        removeCurrentTestPanel();                        
+                        removeCurrentTestPanel();
                         return CodeMirror.Pass;
                     }
                 }
