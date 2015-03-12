@@ -1,6 +1,6 @@
 .CodeMirror {
-    height: 100% !important;
-    width: 100% !important;
+    height: 100%;
+    width: 100%;
     border: 1px solid #eee;
 }
 
@@ -25,6 +25,13 @@
     -o-transition: border linear 0.2s, box-shadow linear 0.2s !important;
     transition: border linear 0.2s, box-shadow linear 0.2s !important;
 }
+
+
+.mxl-form-control .CodeMirror-code {
+    margin: 3px 0px 3px 0px;
+}
+
+
 
 .mxl-form-control .CodeMirror-focused {
     /* Copied from Bootstrap's textarea */

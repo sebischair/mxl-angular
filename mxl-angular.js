@@ -27,6 +27,14 @@ angular.module('mxl', [])
                 $element.html('');
                 codemirror = new window.CodeMirror(function (cm_el) {
                     $element.append(cm_el);
+                    if ($attrs.class) {
+                        cm_el.classList.add($attrs.class);
+                    }
+
+                    if ($attrs.style) {
+                        cm_el.style.cssText = $attrs.style;
+                        console.log(cm_el.style.height);
+                    }
                 }, codemirrorOptions);
                 return codemirror;
             }
