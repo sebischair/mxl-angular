@@ -46,6 +46,7 @@ angular.module('mxl', [])
                 }
 
                 $scope.lineNumbers = $scope.$eval($scope.lineNumbers) && $scope.mode == mxlModes.expression;
+                $scope.lineNumbers = false;
                 $scope.readOnly = $scope.$eval($scope.readOnly);
                 if (!$attrs.mxlValidate) {
                     $scope.validateMxl = null;
@@ -71,8 +72,7 @@ angular.module('mxl', [])
             }
 
             function addTestResult(result) {
-                removeCurrentTestPanel();
-
+                
                 var node = document.createElement("div");
                 node.className = "mxl-result-panel";
 
@@ -84,10 +84,10 @@ angular.module('mxl', [])
                 if (result.status >= 400) {
                     content.innerHTML = "<b>" + (result.data.cause ? result.data.cause : "Error") + "</b><br/>"
                     content.innerHTML += result.data.message;
-                    node.className += " error";
+                    node.className += " alert alert-" + (result.data.cause === "MxLEvaluationException" ? "warning" : "danger");
                     updateLints(result.data);
                 } else {
-                    node.className += " success";
+                    node.className += " alert alert-success";
                     content.innerHTML = "<b>Test result:</b><br/>"
                     content.innerHTML += "" + result.data.value;
                 }
@@ -223,6 +223,8 @@ angular.module('mxl', [])
 
             if ($scope.runTest) {
                 codemirrorOptions.extraKeys["Ctrl-Enter"] = function (cm) {
+                    removeCurrentTestPanel();
+
                     $scope.codemirror.forcedModelUpdate();
                     $q.when($scope.runTest({ value: cm.getValue() }))
                     .then(function (response) {

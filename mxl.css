@@ -4,6 +4,37 @@
     border: 1px solid #eee;
 }
 
+.mxl-form-control .CodeMirror {
+    position: relative;
+    /* This prevents unwanted scrollbars from showing up on the body and wrapper in IE. */
+    overflow: hidden;
+    /* Copied from Bootstrap's textarea */
+    display: inline-block !important;
+    padding: 0 4 4 4 !important;
+    color: #555555 !important;
+    border: 1px solid #ccc !important;
+    -webkit-border-radius: 3px !important;
+    -moz-border-radius: 3px !important;
+    border-radius: 3px !important;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075) !important;
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075) !important;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075) !important;
+    -webkit-transition: border linear 0.2s, box-shadow linear 0.2s !important;
+    -moz-transition: border linear 0.2s, box-shadow linear 0.2s !important;
+    -ms-transition: border linear 0.2s, box-shadow linear 0.2s !important;
+    -o-transition: border linear 0.2s, box-shadow linear 0.2s !important;
+    transition: border linear 0.2s, box-shadow linear 0.2s !important;
+}
+
+.mxl-form-control .CodeMirror-focused {
+    /* Copied from Bootstrap's textarea */
+    border-color: rgba(82, 168, 236, 0.8) !important;
+    outline: 0 !important;
+    outline: thin dotted \9 !important;    
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6) !important;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6) !important;
+}
+
 .CodeMirror-hintHelp {
     width: 370px;
     float: right;
@@ -119,18 +150,9 @@
 }
 
 .mxl-result-panel {
-    border-bottom: 1px solid #dd6;
     padding: 5px;
-    margin-left: 45px;
+    margin-left: 17px;
 }
-
-    .mxl-result-panel.success {
-        background-color: #c5f2c5;
-    }
-
-    .mxl-result-panel.error {
-        background-color: #f5e77d;
-    }
 
 .mxl-result-panel-close {
     float: right;
