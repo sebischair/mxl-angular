@@ -13,7 +13,6 @@ angular.module('mxl', [])
         scope:
             {
                 expression: '=ngModel',
-                lineNumbers: '@mxlLinenumbers',
                 readOnly: '@mxlReadonly',
                 debounce: '@mxlDebounce',
                 additionalHints: '=mxlAutocompletionhints',
@@ -45,13 +44,11 @@ angular.module('mxl', [])
                     $scope.mode = mxlModes.expression;
                 }
 
-                $scope.lineNumbers = $scope.$eval($scope.lineNumbers) && $scope.mode == mxlModes.expression;
-                $scope.lineNumbers = false;
                 $scope.readOnly = $scope.$eval($scope.readOnly);
                 if (!$attrs.mxlValidate) {
                     $scope.validateMxl = null;
                 }
-                
+
                 if (!$attrs.mxlRuntest || $scope.readOnly || $scope.mode != mxlModes.expression) {
                     $scope.runTest = null;
                 }
@@ -72,7 +69,7 @@ angular.module('mxl', [])
             }
 
             function addTestResult(result) {
-                
+
                 var node = document.createElement("div");
                 node.className = "mxl-result-panel";
 
@@ -177,7 +174,6 @@ angular.module('mxl', [])
                 autoCloseBrackets: true,
                 highlightSelectionMatches: { showToken: /\w/ },
                 viewportMargin: Infinity,
-                lineNumbers: $scope.lineNumbers,
                 readOnly: $scope.readOnly,
                 mode: 'mxl',
                 gutters: ["CodeMirror-lint-markers"],
@@ -235,7 +231,7 @@ angular.module('mxl', [])
                 }
             }
 
-            
+
             $scope.codemirror = newCodemirrorEditor($element, codemirrorOptions);
 
             configNgModelLink($scope.codemirror, ctrl[0], $scope);
