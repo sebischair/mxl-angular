@@ -94,7 +94,7 @@ angular.module('mxl', [])
                 } else {
                     node.className += " alert alert-success";
                     content.innerHTML = "<b>Test result:</b><br/>"
-                    content.innerHTML += "" + result.data.value;
+                    content.innerHTML += "" + JSON.stringify(result.data.value);
                 }
 
                 if ($scope.testResultWidget) {
