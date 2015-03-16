@@ -68,3 +68,12 @@ myApp.controller('myController', function ($scope) {
    $scope.expr = "[1, 2, 3].sum()";
 }
 ```
+### Additional Auto Completion Hints ###
+By default, the MxL code editor already proposes the MxL keywords (e.g., **find**, **this**, etc.) as hints for the auto completion feature.
+Additional hints can be provided through the **mxl-autocompletionhints** attribute:
+
+```
+#!html
+
+<mxl-expression ng-model="expectedType" mxl-autocompletionhints="autoCompletionHints"></mxl-expression>
+```
