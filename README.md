@@ -86,6 +86,8 @@ scService.mxlAutoComplete($scope.workspaceId).then(function (response) {
         $scope.autoCompletionHints = response.data;
     });
 ```
+The auto-completion can be triggered by either typing a dot (".") or pressing ctrl-space.
+
 Note: Providing the id of a specific workspace ensures the inclusion of workspace-specific identifiers into the list of additional hints, e.g., types and their attributes.
 
 ### MxL Validation ###
@@ -104,4 +106,26 @@ $scope.validate = function (modelValue, viewValue) {
 ```
 Note: Providing the id of a specific workspace ensures the validation of the expression in the context of the respective workspace, i.e., workspace-specific identifiers (e.g., types) can be resolved.
 
+### Debounced Model Update ###
+By default, the mxl-expression directive updates its model value only after 2 seconds without a change. This should ensure that the validation service is not requested after each minor change of the model value.
+You can adapt this duration by setting the **mxl-debounce** attribute of the mxl-expression directive (milliseconds):
+```
+#!html
+<mxl-expression ng-model="mxlValue" mxl-debounce="5000"></mxl-expression>
+```
 ### "Try it out" feature ###
+For some cases it might be helpful for the user to run a test of the expression. For this purpose, the mxl-expression directive supports the "Try it out" feature, which can be triggered by pressing ctrl-enter.
+
+To enable this feature, you have to provide the **mxl-runtest** attribute to the mxl-expression directive:
+```
+#!html
+<mxl-expression ng-model="mxlValue" mxl-runtest="runTest(value)"></mxl-expression>
+```
+As soon as the user triggers the test, the model value will be changed immediately, and the actual value will be passed to the specified runtest function. The result has to be a promise which either resolves (in case of success) and passes the evaluated value as parameter to the callback function, or rejects (in case of failure) and passes the actual error message to the callback function.
+An exemplary implementation by integrating SocioCortex might look like follows:
+```
+#!javascript
+$scope.runTest = function (value) {
+        return scService.mxlQuery(value, $scope.workspaceId);
+    };
+```
