@@ -1,13 +1,13 @@
 # MxL Expression Directive #
 
-This directive is based on the [CodeMirror (v5)](http://codemirror.net/) code editor control and allows you to easily add a MxL code editor into your web application. This MxL code editor already supports useful features like MxL-specific syntax highlighting, auto-completion support, and "try it out".
+This directive is based on the [CodeMirror (v5)](http://codemirror.net/) code editor control and allows you to easily add a [MxL](http://131.159.30.153/pages/nnpd6s1j1hsm/MxL-Documentation) code editor into your web application. This MxL code editor already supports useful features like MxL-specific syntax highlighting, auto-completion support, and "try it out".
 
 ### Requirements ###
 * AngularJS 1.3.x
 
 ### Usage ###
 
-Load the following script files into your application:
+Clone the repository into your web application directory and load the following script files into your application:
 
 ```
 #!html
@@ -41,4 +41,14 @@ Load the following script files into your application:
 <script src="mxl/mxl-lint.js"></script>
 <link rel="stylesheet" href="mxl/mxl.css" />
 ```
+Add the mxl module as a dependency to your application module:
 
+```
+#!javascript
+var myApp = angular.module('ceapp', ['mxl']);
+```
+Add the mxl-expression directive as element to your html:
+```
+#!html
+<mxl-expression ></mxl-expression>
+```
