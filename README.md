@@ -16,7 +16,7 @@ Clone the repository into your web application directory and load the following 
 <!-- AnguarJS -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js" type="text/javascript"></script>
 
-<!-- SocioCortex scripts (if you want to bind the MxL to SocioCortex) -->
+<!-- SocioCortex scripts (if you want to bind the MxL to SocioCortex as shown in the examples below) -->
 <script src="sc/sc-angular.js" type="text/javascript"></script>
 
 <!-- CodeMirror scripts -->
@@ -47,7 +47,7 @@ Add the mxl module as a dependency to your application module:
 
 ```
 #!javascript
-var myApp = angular.module('ceapp', ['mxl']);
+var myApp = angular.module('ceapp', ['mxl', 'sociocortex']);
 ```
 Add the mxl-expression directive as element to your html:
 ```
@@ -77,3 +77,12 @@ Additional hints can be provided through the **mxl-autocompletionhints** attribu
 
 <mxl-expression ng-model="expectedType" mxl-autocompletionhints="autoCompletionHints"></mxl-expression>
 ```
+Thereby, you can set the additional hints in the controller of your app, e.g., by loading them from SocioCortex:
+
+```
+#!javascript
+scService.mxlAutoComplete($scope.workspaceId).then(function (response) {
+        $scope.autoCompletionHints = response.data;
+    });
+```
+By the way: Providing the id of a specific workspace ensures the inclusion of workspace-specific identifiers into the list of additional hints, e.g., types and their attributes.
