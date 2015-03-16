@@ -1,6 +1,8 @@
 # MxL Expression Directive #
 
-This directive is based on the [CodeMirror (v5)](http://codemirror.net/) code editor control and allows you to easily add a [MxL](http://131.159.30.153/pages/nnpd6s1j1hsm/MxL-Documentation) code editor into your web application. This MxL code editor already supports useful features like MxL-specific syntax highlighting, auto-completion support, and "try it out".
+This directive is based on the [CodeMirror (v5)](http://codemirror.net/) code editor control and the [ui-codemirror](github.com/angular-ui/ui-codemirror) directive. 
+
+It allows you to easily add a [MxL](http://131.159.30.153/pages/nnpd6s1j1hsm/MxL-Documentation) code editor into your web application. This MxL code editor already supports useful features like MxL-specific syntax highlighting, auto-completion support, and a "try it out" feature.
 
 ### Requirements ###
 * AngularJS 1.3.x
@@ -51,4 +53,18 @@ Add the mxl-expression directive as element to your html:
 ```
 #!html
 <mxl-expression ></mxl-expression>
+```
+### Working with ng-model ###
+The mxl-expression directive supports AngularJS' two-way binding by using the ng-model attribute:
+
+```
+#!html
+<mxl-expression ng-model="expr"></mxl-expression>
+```
+The mxl-expression directive only supports standard javascript strings as model value, e.g.:
+```
+#!javascript
+myApp.controller('myController', function ($scope) {
+   $scope.expr = "[1, 2, 3].sum()";
+}
 ```
