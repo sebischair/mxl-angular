@@ -113,7 +113,7 @@ You can adapt this duration by setting the **mxl-debounce** attribute of the mxl
 #!html
 <mxl-expression ng-model="expr" mxl-debounce="5000"></mxl-expression>
 ```
-### "Try it out" feature ###
+### "Try it out" Feature ###
 For some cases it might be helpful for the user to run a test of the expression. For this purpose, the mxl-expression directive supports the "Try it out" feature, which can be triggered by pressing ctrl-enter.
 
 To enable this feature, you have to provide the **mxl-runtest** attribute to the mxl-expression directive:
@@ -129,7 +129,7 @@ $scope.runTest = function (value) {
         return scService.mxlQuery(value, $scope.workspaceId);
     };
 ```
-### MxL modes ###
+### MxL Modes ###
 The mxl-expression directive supports three modes which can be specified by the **mxl-mode** attribute:
 * expression (default): The value of the code editor is interpreted as an arbitrary MxL expression
 * type: The value of the code editor is interpreted as the specification of an (eventually parameterized) MxL type, e.g., **Sequence<Number>**
