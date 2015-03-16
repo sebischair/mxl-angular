@@ -129,3 +129,10 @@ $scope.runTest = function (value) {
         return scService.mxlQuery(value, $scope.workspaceId);
     };
 ```
+### MxL modes ###
+The mxl-expression directive supports three modes which can be specified by the **mxl-mode** attribute:
+* expression (default): The value of the code editor is interpreted as an arbitrary MxL expression
+* type: The value of the code editor is interpreted as the specification of an (eventually parameterized) MxL type, e.g., **Sequence<Number>**
+* parameters: The value of the code editor is interpreted as a comma-seperated list of parameter declarations, e.g., **name:String, n:Number**
+
+Note: "Try it out" feature only works in default mode. Furthermore, in modes type and parameters the auto completion hints are restricted to types and workspaces.
