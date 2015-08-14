@@ -8,7 +8,6 @@ angular.module('mxl', [])
 })
 .directive('mxlExpression', function ($timeout, $q, mxlModes) {
     return {
-        restrict: 'E',
         require: ["^ngModel"],
         scope:
             {
@@ -21,7 +20,6 @@ angular.module('mxl', [])
                 validateMxl: '&mxlValidate'
             },
         link: function ($scope, $element, $attrs, ctrl) {
-
             function newCodemirrorEditor($element, codemirrorOptions) {
                 var codemirror;
                 $element.html('');
@@ -94,7 +92,7 @@ angular.module('mxl', [])
                 } else {
                     node.className += " alert alert-success";
                     content.innerHTML = "<b>Test result:</b><br/>"
-                    content.innerHTML += "" + JSON.stringify(result.data.value);
+                    content.innerHTML += "" + JSON.stringify(result.data.value, null, 2);
                 }
 
                 if ($scope.testResultWidget) {
