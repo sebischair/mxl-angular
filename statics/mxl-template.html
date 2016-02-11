@@ -1,0 +1,84 @@
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="nav navbar-nav">
+            <ul class="nav nav-pills nav-stacked" id="tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#pro-editor-{{id}}" data-toggle="pill"><i class="fa fa-code fa-lg"></i></a>
+                </li>
+                <li role="presentation">
+                    <a href="#wizard-{{id}}" data-toggle="pill"><i class="fa fa-magic fa-lg"></i></a>
+                </li>
+            </ul>
+        </nav>
+        <div class="col-md-10 tab-content">
+            <div id="pro-editor-{{id}}" class="pro-editor tab-pane fade in active">
+                <editor></editor>
+            </div>
+            <div id="wizard-{{id}}" class="tab-pane fade">
+                <div class="selection" ng-show="selectedEntity == null || changingEntity">
+                    <div class="step">
+                        <div class="row row-md-height row-margin">
+                            <div class="col-md-1 col-md-height step-number unfinished">
+                                <p>1</p>
+                            </div>
+                            <div class="col-md-12 back-padding">
+                                <div class="input-group">
+                                    <input id="entity" ng-model="entityName" list="entities" class="form-control" ng-keypress="selectEntity($event)">
+                                    <datalist id="entities">
+                                        <option ng-repeat="entity in entities" value="{{entity.name}}">
+                                    </datalist>
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-primary" type="button" ng-click="selectEntity(null)" ng-disabled="entityName == null">
+                                            <i class="glyphicon glyphicon-ok"></i>
+                                        </button>
+                                        <button class="btn btn-primary" type="button" ng-click="cancelChange()" ng-if="changingEntity">
+                                            <i class="glyphicon glyphicon-remove"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="selection" ng-hide="selectedEntity == null || changingEntity">
+                    <div class="step">
+                        <div class="row row-md-height row-margin">
+                            <div class="col-md-1 col-md-height step-number">
+                                <p>1</p>
+                            </div>
+                            <div class="col-md-12 back-padding">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" value="{{selectedEntity.name}}" readonly="readonly">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-primary" type="button"  ng-click="changeEntity()">
+                                            <i class="fa fa-pencil-square-o fa-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="loading selection" ng-if="selectedEntity != null && intermediateResults == null">
+                    <i class="fa fa-spinner fa-pulse fa-3x"></i>
+                </div>
+                <div id="main-wizard" ng-if="intermediateResults != null">
+                    <div ng-repeat="result in intermediateResults">
+                        <mxl-intermediate></mxl-intermediate>
+                        <div class="selection" ng-if="result.functions != null">
+                            <mxl-wizard-methods></mxl-wizard-methods>
+                        </div>
+                    </div>
+                    <!--<div class="selection" ng-hide="intermediateResults == null || endOfWizard" >
+                        <img class="add-button" alt="Add a function" title="Add a function"
+                             src="statics/images/add-button.png" ng-click="addFunction()">
+                    </div>-->
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
