@@ -1,0 +1,40 @@
+{
+  "name": "mxl-angular",
+  "version": "0.9.0",
+  "description": "An interactive code editor for MxL, the model-based expression language for SocioCortex",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sebischair/mxl-angular"
+  },
+  "keywords": [
+    "angular",
+    "sebis",
+    "sociocortex",
+	"mxl"
+  ],
+  "author": {
+    "name": "Sebis",
+    "url": "https://wwwmatthes.in.tum.de"
+  },
+  "contributors": [
+    {
+      "name": "Thomas Reschenhofer",
+      "email": "thomas.reschenhofer@tum.de",
+      "url": "https://wwwmatthes.in.tum.de/pages/gbocu2jbwx6a/Thomas-Reschenhofer"
+    }
+  ],
+  "license": "Sebis Proprietary",
+  "bugs": {
+    "url": "https://bitbucket.org/sebischair/mxl-angular/issues"
+  },
+  "homepage": "https://bitbucket.org/sebischair/mxl-angular",
+  "devDependencies": {
+   "grunt": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-connect": "*",
+    "grunt-wiredep": "*"
+  }
+}

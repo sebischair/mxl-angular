@@ -1,0 +1,41 @@
+{
+  "name": "mxl-angular",
+  "version": "1.0.0",
+  "homepage": "github.com/sebischair/mxl-angular",
+  "authors": [
+    "Thomas Reschenhofer <thomas.reschenhofer@tum.de>"
+  ],
+  "main": [ "dist/mxl-angular.js", "dist/mxl-angular.css" ],
+  "overrides": {
+    "backbone": { "main": [ "backbone.js" ] },
+    "dagre": { "main": [ "dist/dagre.core.js" ] },
+    "joint": {
+      "main": [
+        "dist/joint.core.js",
+        "dist/joint.shapes.uml.js",
+        "dist/joint.layout.DirectedGraph.js",
+        "dist/joint.css"
+      ]
+    }
+  },
+  "description": "An interactive code editor for MxL, the model-based expression language for SocioCortex",
+  "keywords": [
+    "angular",
+    "sebis",
+    "sociocortex",
+    "mxl"
+  ],
+  "license": "Sebis Proprietary",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "package.json",
+    "src"
+  ],
+  "dependencies": {
+    "sc-angular": "*",
+    "lodash": "*",
+    "joint": "*"
+  }
+}
