@@ -114,24 +114,6 @@
     <script src="../src/directives/mxl-expression/mxl-parse.js" type="text/javascript"></script>
     <script src="../src/directives/mxl-model-view/mxl-model-view.directive.js" type="text/javascript"></script>
 
-    <script type="text/javascript">
-        var ceapp = angular.module('ceapp', ['sociocortex', 'mxl']).value('scConnection', {
-                baseUri: 'http://localhost:8083/intern/tricia',
-                apiVersion: 'v1'
-            });
-
-        ceapp.controller('testController', function ($scope, scAuth) {
-            //scAuth.login('sociocortex.sebis@tum.de', 'sebis' );
-            scAuth.login('mustermann@test.sc', 'ottto');
-
-            //$scope.expectedType = 'Number';
-            //$scope.mxlParameters = 'list:Sequence<Customer>, map:Function<Customer,Number>';
-            $scope.mxlValue = 'find Order.select(Customer.Turnover)';
-            //$scope.workspaceId = '107yhdgc7q9u6';           
-            $scope.workspaceId = 'northwind';
-        });
-
-    </script>
-
+    <script src="demo.local.js" type="text/javascript"></script>  
 </body>
 </html>

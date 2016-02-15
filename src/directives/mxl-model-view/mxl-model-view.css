@@ -6,7 +6,7 @@
     display: none;
 }
 
-.marker-arrowhead-group {
+.marker-arrowhead {
     display: none;
 }
 
@@ -37,6 +37,7 @@
     fill: #cfe8fa;
     stroke: #fff;
     stroke-width: 0.5;
+
 }
 
 g.label > text > tspan {

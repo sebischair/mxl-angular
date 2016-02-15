@@ -164,7 +164,7 @@
             });
 
             _.each(node.derivedAttributes, function (a) {
-                classData.attributes.push('/' + a.data.name + ' : ' + a.data.inferredAttributeType);
+                classData.attributes.push('/ ' + a.data.name + ' : ' + a.data.inferredAttributeType);
                 classData.size.height += 14;
 
                 if (a.markAsExplicit) {
@@ -192,7 +192,10 @@
             var associationData = {
                 source: { id: classes[edge.source].id },
                 target: { id: classes[edge.target].id },
-                labels: [{ position: -35, attrs: { text: { text: edge.data.name } } }]
+                labels: [{ position: 0.5, attrs: { text: { text: edge.data.name } } }],
+                attrs: {
+                    '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 L 0 5 L 10 5 L 0 5 z' }
+                }
             };
 
             if (edge.markAsExplicit) {
@@ -224,5 +227,5 @@
             edgeSep: 300,
             rankDir: direction
         });
-    }
+    }    
 })();
