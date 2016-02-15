@@ -2,50 +2,16 @@
 
 This directive is based on the [CodeMirror (v5)](http://codemirror.net/) code editor control and the [ui-codemirror](github.com/angular-ui/ui-codemirror) directive. 
 
-It allows you to easily add a [MxL](http://131.159.30.153/pages/nnpd6s1j1hsm/MxL-Documentation) code editor into your web application. This MxL code editor already supports useful features like MxL-specific syntax highlighting, auto-completion support, and a "try it out" feature.
+It allows you to easily add a [MxL](https://server.sociocortex.com/pages/nnpd6s1j1hsm/MxL-Documentation) code editor into your web application. This MxL code editor already supports useful features like MxL-specific syntax highlighting, auto-completion support, and a "try it out" feature.
 
-Note: In the following examples, the MxL code editor is bound to [SocioCortex](http://sebischair.github.io/dist/index.html) through the [sc-angular](github.com/sebischair/sc-angular) module.
+Note: In the following examples, the MxL code editor is bound to [SocioCortex](http://sociocortex.com) through the [sc-angular](github.com/sebischair/sc-angular) module.
 
 ### Requirements ###
 * AngularJS 1.3.x
 
 ### Usage ###
 
-Clone the repository into your web application directory and load the following script files into your application:
-
-```
-#!html
-<!-- AnguarJS -->
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js" type="text/javascript"></script>
-
-<!-- SocioCortex scripts (if you want to bind the MxL to SocioCortex as shown in the examples below) -->
-<script src="sc/sc-angular.js" type="text/javascript"></script>
-
-<!-- CodeMirror scripts -->
-<script src="mxl/CodeMirror/codemirror.js">   </script>
-<script src="mxl/CodeMirror/addon/display/fullscreen.js"></script>
-<script src="mxl/CodeMirror/addon/display/panel.js"></script>
-<script src="mxl/CodeMirror/addon/edit/matchbrackets.js"></script>
-<script src="mxl/CodeMirror/addon/edit/closebrackets.js"></script>
-<script src="mxl/CodeMirror/addon/hint/show-hint.js"></script>
-<script src="mxl/CodeMirror/addon/lint/lint.js"></script>
-<script src="mxl/CodeMirror/addon/search/searchcursor.js"></script>
-<script src="mxl/CodeMirror/addon/search/match-highlighter.js"></script>
-<script src="mxl/CodeMirror/addon/runmode/runmode.js"></script>
-
-<link rel="stylesheet" href="mxl/CodeMirror/codemirror.css" />
-<link rel="stylesheet" href="mxl/CodeMirror/addon/hint/show-hint.css" />
-<link rel="stylesheet" href="mxl/CodeMirror/addon/display/fullscreen.css" />
-<link rel="stylesheet" href="mxl/CodeMirror/addon/lint/lint.css" />
-
-<!-- MxL scripts -->
-<script src="mxl/mxl-angular.js" type="text/javascript"></script>
-<script src="mxl/mxl-parse.js"></script>
-<script src="mxl/mxl-hint.js"></script>
-<script src="mxl/mxl-lint.js"></script>
-<link rel="stylesheet" href="mxl/mxl.css" />
-```
-Add the mxl module as a dependency to your application module:
+Install mxl-angular by using bower (bower install mxl-angular). After that, link the mxl-angular.js (or minified version) as well as the css-file in your HTML file and add the mxl-angular module as a dependency to your application module. Use [wiredep](https://github.com/taptapship/wiredep) to link all dependencies.
 
 ```
 #!javascript
