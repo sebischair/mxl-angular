@@ -1,3 +1,45 @@
-.link-tools .tool-remove { display: none }
-.link-tools .tool-options { display: none }
-.marker-arrowhead-group { display: none }
+.link-tools .tool-remove {
+    display: none;
+}
+
+.link-tools .tool-options {
+    display: none;
+}
+
+.marker-arrowhead-group {
+    display: none;
+}
+
+.uml-class-methods-rect {
+    display: none;
+}
+
+.uml-class-name-rect {
+    fill: #88C0E8;
+    stroke: #ffffff;
+    stroke-width: 0.5;
+    font-size:18px !important;
+}
+
+.uml-class-name-rect {
+    height:50px;
+}
+
+.uml-class-name-text > tspan {
+    font-size:15px;
+}
+
+.uml-class-attrs-text > tspan {
+    font-size:13px;
+}
+
+.uml-class-attrs-rect, .uml-class-methods-rect {
+    fill: #cfe8fa;
+    stroke: #fff;
+    stroke-width: 0.5;
+}
+
+g.label > text > tspan {
+    font-size:13px;
+    font-weight:normal;
+}

@@ -10063,6 +10063,7 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
             scope:
                 {
                     expression: '=ngModel',
+                    mxlSemantics: '=mxlSemantics',
                     readOnly: '@mxlReadonly',
                     debounce: '@mxlDebounce',
                     mode: '@mxlMode',
@@ -10095,7 +10096,6 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
 
                         if ($attrs.style) {
                             cm_el.style.cssText = $attrs.style;
-                            console.log(cm_el.style.height);
                         }
                     }, codemirrorOptions);
                     return codemirror;
@@ -10282,6 +10282,9 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
 
                     return scMxl.validate(mxlContext, value,
                         function (response) {
+                            if ($attrs.mxlSemantics) {
+                                $scope.mxlSemantics = response.dependencies;
+                            }
                             updateLints(null);
                             def.resolve();
                         }, function (response) {
@@ -11224,196 +11227,202 @@ CodeMirror.defineMIME("application/mxl", {
 });
 
 (function () {
-    angular.module('mxl').directive('mxlModelView', function (scModel) {
+    angular.module('mxl').directive('mxlModelView', function () {
         return {
             require: ["^ngModel"],
             scope:
                 {
-                    expression: '=ngModel',
+                    mxlSemantics: '=mxlSemantics',
                     width: '@width',
                     height: '@height'
                 },
             link: function ($scope, $element, $attrs, ctrl) {
 
-                var graph = new joint.dia.Graph();
+                $scope.$watch('mxlSemantics', function () {
+                    if ($scope.mxlSemantics) {
 
-                var paper = new joint.dia.Paper({
-                    el: $element,
-                    width: $scope.width,
-                    height: $scope.height,
-                    gridSize: 1,
-                    model: graph,
-                    interactive:false
-                });
+                        var graphData = {
+                            nodes: {},
+                            edges: {}
+                        };
 
+                        initiateGraphData($scope.mxlSemantics.dependencies, graphData);
 
-                var uml = joint.shapes.uml;
+                        if (!$scope.graph) {
+                            $scope.graph = new joint.dia.Graph();
 
-                var classes = {
-
-                    mammal: new uml.Interface({
-                        size: { width: 240, height: 100 },
-                        name: 'Mammal',
-                        attributes: ['dob: Date'],
-                        methods: ['+ setDateOfBirth(dob: Date): Void', '+ getAgeAsDays(): Numeric'],
-                        attrs: {
-                            '.uml-class-name-rect': {
-                                fill: '#feb662',
-                                stroke: '#ffffff',
-                                'stroke-width': 0.5
-                            },
-                            '.uml-class-attrs-rect, .uml-class-methods-rect': {
-                                fill: '#fdc886',
-                                stroke: '#fff',
-                                'stroke-width': 0.5
-                            },
-                            '.uml-class-attrs-text': {
-                                ref: '.uml-class-attrs-rect',
-                                'ref-y': 0.5,
-                                'y-alignment': 'middle'
-                            },
-                            '.uml-class-methods-text': {
-                                ref: '.uml-class-methods-rect',
-                                'ref-y': 0.5,
-                                'y-alignment': 'middle'
-                            }
-
+                            var paper = new joint.dia.Paper({
+                                el: $element,
+                                width: $scope.width,
+                                height: $scope.height,
+                                gridSize: 1,
+                                model: $scope.graph,
+                                interactive: false
+                            });
                         }
-                    }),
 
-                    person: new uml.Abstract({
-                        size: { width: 260, height: 100 },
-                        name: 'Person',
-                        attributes: ['firstName: String', 'lastName: String'],
-                        methods: ['+ setName(first: String, last: String): Void', '+ getName(): String'],
-                        attrs: {
-                            '.uml-class-name-rect': {
-                                fill: '#68ddd5',
-                                stroke: '#ffffff',
-                                'stroke-width': 0.5
-                            },
-                            '.uml-class-attrs-rect, .uml-class-methods-rect': {
-                                fill: '#9687fe',
-                                stroke: '#fff',
-                                'stroke-width': 0.5
-                            },
-                            '.uml-class-methods-text, .uml-class-attrs-text': {
-                                fill: '#fff'
-                            }
-                        }
-                    }),
-
-                    bloodgroup: new uml.Class({
-                         size: { width: 220, height: 100 },
-                        name: 'BloodGroup',
-                        attributes: ['bloodGroup: String'],
-                        methods: ['+ isCompatible(bG: String): Boolean'],
-                        attrs: {
-                            '.uml-class-name-rect': {
-                                fill: '#ff8450',
-                                stroke: '#fff',
-                                'stroke-width': 0.5,
-                            },
-                            '.uml-class-attrs-rect, .uml-class-methods-rect': {
-                                fill: '#fe976a',
-                                stroke: '#fff',
-                                'stroke-width': 0.5
-                            },
-                            '.uml-class-attrs-text': {
-                                ref: '.uml-class-attrs-rect',
-                                'ref-y': 0.5,
-                                'y-alignment': 'middle'
-                            },
-                            '.uml-class-methods-text': {
-                                ref: '.uml-class-methods-rect',
-                                'ref-y': 0.5,
-                                'y-alignment': 'middle'
-                            }
-                        }
-                    }),
-
-                    address: new uml.Class({
-                        size: { width: 160, height: 100 },
-                        name: 'Address',
-                        attributes: ['houseNumber: Integer', 'streetName: String', 'town: String', 'postcode: String'],
-                        methods: [],
-                        attrs: {
-                            '.uml-class-name-rect': {
-                                fill: '#ff8450',
-                                stroke: '#fff',
-                                'stroke-width': 0.5
-                            },
-                            '.uml-class-attrs-rect, .uml-class-methods-rect': {
-                                fill: '#fe976a',
-                                stroke: '#fff',
-                                'stroke-width': 0.5,
-                            },
-                            '.uml-class-attrs-text': {
-                                'ref-y': 0.5,
-                                'y-alignment': 'middle'
-                            }
-                        },
-
-                    }),
-
-                    man: new uml.Class({
-                        size: { width: 180, height: 50 },
-                        name: 'Man',
-                        attrs: {
-                            '.uml-class-name-rect': {
-                                fill: '#ff8450',
-                                stroke: '#fff',
-                                'stroke-width': 0.5
-                            },
-                            '.uml-class-attrs-rect, .uml-class-methods-rect': {
-                                fill: '#fe976a',
-                                stroke: '#fff',
-                                'stroke-width': 0.5
-                            }
-                        }
-                    }),
-
-                    woman: new uml.Class({
-                        size: { width: 180, height: 50 },
-                        name: 'Woman',
-                        methods: ['+ giveABrith(): Person []'],
-                        attrs: {
-                            '.uml-class-name-rect': {
-                                fill: '#ff8450',
-                                stroke: '#fff',
-                                'stroke-width': 0.5
-                            },
-                            '.uml-class-attrs-rect, .uml-class-methods-rect': {
-                                fill: '#fe976a',
-                                stroke: '#fff',
-                                'stroke-width': 0.5
-                            },
-                            '.uml-class-methods-text': {
-                                'ref-y': 0.5,
-                                'y-alignment': 'middle'
-                            }
-                        }
-                    })
+                        buildGraph(graphData, $scope.graph);
+                    }
+                }, true);
 
 
-                };
 
-                _.each(classes, function (c) { graph.addCell(c); });
-
-                var relations = [
-                    new uml.Generalization({ source: { id: classes.man.id }, target: { id: classes.person.id } }),
-                    new uml.Generalization({ source: { id: classes.woman.id }, target: { id: classes.person.id } }),
-                    new uml.Implementation({ source: { id: classes.person.id }, target: { id: classes.mammal.id } }),
-                    new uml.Aggregation({ source: { id: classes.person.id }, target: { id: classes.address.id } }),
-                    new uml.Composition({ source: { id: classes.person.id }, target: { id: classes.bloodgroup.id } })
-                ];
-
-                _.each(relations, function (r) { graph.addCell(r); });
-
-                joint.layout.DirectedGraph.layout(graph, { setLinkVertices: false });
 
             }
         }
     });
 
+    function initiateGraphData(dependencies, graphData) {
+        if (!dependencies) {
+            dependencies = [];
+        }
+
+        _.each(dependencies, function (dep) {
+            if (dep.entityType) {
+                generateEntityType(graphData, dep.entityType, true);
+            } else if (dep.attributeDefinition) {
+                generateAttributeDefinition(graphData, dep.attributeDefinition, true);
+            } else if (dep.derivedAttributeDefinition) {
+                generateDerivedAttributeDefinition(graphData, dep.derivedAttributeDefinition, true);
+            }
+        });
+    }
+
+    function generateEntityType(graphData, entityType, addAttributes) {
+        var classNode = graphData.nodes[entityType.id];
+        if (!classNode) {
+            classNode = { id: entityType.id, data: entityType };
+            graphData.nodes[entityType.id] = classNode;
+        }
+
+        if (addAttributes) {
+            classNode.attributes = {};
+            classNode.derivedAttributes = {};
+            _.each(entityType.attributeDefinitions, function (ad) {
+                var attribute = generateAttributeDefinition(graphData, ad);
+                if (!attribute.source) {
+                    classNode.attributes[ad.id] = attribute;
+                }
+            });
+
+            _.each(entityType.derivedAttributeDefinitions, function (dad) {
+                classNode.derivedAttributes[dad.id] = generateDerivedAttributeDefinition(graphData, dad);
+            });
+        }
+
+        return classNode;
+    }
+
+    function generateAttributeDefinition(graphData, attributeDefinition, markAsExplicit) {
+        if (attributeDefinition.attributeType === "Link" && attributeDefinition.options && attributeDefinition.options.entityType) {
+            var edge = graphData.edges[attributeDefinition.id];
+
+            if (!edge) {
+                var targetType = attributeDefinition.options.entityType;
+                generateEntityType(graphData, targetType, true);
+
+                graphData.edges[attributeDefinition.id] = { data: attributeDefinition, source: attributeDefinition.entityType.id, target: targetType.id };
+                edge = graphData.edges[attributeDefinition.id];
+            } 
+
+            edge.markAsExplicit = edge.markAsExplicit || markAsExplicit;
+
+            return edge;
+
+        } else {
+            var classNode = generateEntityType(graphData, attributeDefinition.entityType);
+
+            if (!classNode.attributes) {
+                classNode.attributes = {};
+            }
+
+            var attributeNode = classNode.attributes[attributeDefinition.id];
+            if (!attributeNode) {
+                classNode.attributes[attributeDefinition.id] = { data: attributeDefinition };
+                attributeNode = classNode.attributes[attributeDefinition.id];
+            }
+
+            attributeNode.markAsExplicit = attributeNode.markAsExplicit || markAsExplicit;
+
+            return attributeNode;
+        }
+    }
+
+    function generateDerivedAttributeDefinition(graphData, derivedAttributeDefinition, markAsExplicit) {
+        var classNode = generateEntityType(graphData, derivedAttributeDefinition.entityType);
+
+        if (!classNode.derivedAttributes)
+        {
+            classNode.derivedAttributes = {};
+        }
+
+        var derivedAttributeNode = classNode.derivedAttributes[derivedAttributeDefinition.id];
+        if (!derivedAttributeNode) {
+            classNode.derivedAttributes[derivedAttributeDefinition.id] = { data: derivedAttributeDefinition };
+            derivedAttributeNode = classNode.derivedAttributes[derivedAttributeDefinition.id];
+        }
+
+        derivedAttributeNode.markAsExplicit = derivedAttributeNode.markAsExplicit || markAsExplicit;
+
+        return derivedAttributeNode;
+    }
+
+    function buildGraph(graphData, graph) {
+
+        var uml = joint.shapes.uml;
+
+        var classes = {};
+        graph.clear();
+
+        _.each(graphData.nodes, function (node) {
+            var classData = {
+                size: { width: 150, height: 30 },
+                name: node.data.name,
+                attributes: [],
+                attrs: {
+                    '.uml-class-attrs-text': {
+                        ref: '.uml-class-attrs-rect',
+                        'ref-y': 0.5,
+                        'y-alignment': 'middle',
+                        'entityType' : node.name
+                    }
+                }
+            };
+
+            _.each(node.attributes, function (a) {
+                classData.attributes.push(a.data.name + ' : ' + a.data.attributeType + '');
+                classData.size.height += 14;
+            });
+
+            _.each(node.derivedAttributes, function (a) {
+                classData.attributes.push('/' + a.data.name + ' : ' + a.data.inferredAttributeType);
+                classData.size.height += 14;
+            });
+
+            if (classData.attributes.length === 0) {
+                classData.attrs['.uml-class-attrs-rect'] = { 'display': 'none' };
+            } else {
+                classData.attrs['.uml-class-attrs-rect'] = { 'display': 'inherit' };
+            }
+
+            var c = new uml.Class(classData);
+            classes[node.id] = c;
+            graph.addCell(c);
+
+        });
+
+        _.each(graphData.edges, function (edge) {
+            graph.addCell(new uml.Association({ source: { id: classes[edge.source].id }, target: { id: classes[edge.target].id }, labels:  [
+        { position: -25, attrs: { text: { text: edge.data.name } }}
+            ]}));
+        });
+
+        joint.layout.DirectedGraph.layout(graph, { setLinkVertices: false });
+
+        console.log(classes);
+
+        $('.uml-class-attrs-text:eq(0) tspan:eq(2)').each(function () {
+            $(this).css('font-weight', '1000');
+        });
+    }
 })();

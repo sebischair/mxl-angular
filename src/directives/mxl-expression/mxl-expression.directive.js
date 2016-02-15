@@ -1,11 +1,11 @@
 ﻿(function () {
-    angular.module('mxl').directive('mxlExpression', function ($timeout, $q, mxlModes, scMxl) {
+    angular.module('mxl').directive('mxlExpression', function ($timeout, $q, mxlModes, scMxl, mxlUtil) {
         return {
             require: ["^ngModel"],
             scope:
                 {
                     expression: '=ngModel',
-                    mxlSemantics: '=mxlSemantics',
+                    mxlModelElements: '=mxlModelElements',
                     readOnly: '@mxlReadonly',
                     debounce: '@mxlDebounce',
                     mode: '@mxlMode',
@@ -184,7 +184,7 @@
                     gutters: ["CodeMirror-lint-markers"],
                     lint: true,
                     onlyLimitedHints: $scope.mode !== mxlModes.expression,
-                    debounce: $scope.debounce ? $scope.debounce : 2000,
+                    debounce: $scope.debounce ? $scope.debounce : 1000,
                     theme: 'mxl',
                     extraKeys: {
                         "Ctrl-Space": "autocomplete",
@@ -224,8 +224,8 @@
 
                     return scMxl.validate(mxlContext, value,
                         function (response) {
-                            if ($attrs.mxlSemantics) {
-                                $scope.mxlSemantics = response.dependencies;
+                            if ($attrs.mxlModelElements) {
+                                $scope.mxlModelElements = mxlUtil.getElementsForModelViewByDependencies(response.dependencies);
                             }
                             updateLints(null);
                             def.resolve();

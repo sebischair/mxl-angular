@@ -645,6 +645,30 @@ li.CodeMirror-hint-active {
         color: #777;
     }
 
-.mxl-view-model-cytoscape-container {   
+.link-tools .tool-remove {
+    display: none;
+}
 
+.link-tools .tool-options {
+    display: none;
+}
+
+.marker-arrowhead-group {
+    display: none;
+}
+
+.uml-class-methods-rect {
+    display: none;
+}
+
+.uml-class-name-rect {
+    fill: #feb662;
+    stroke: #ffffff;
+    stroke-width: 0.5;
+}
+
+.uml-class-attrs-rect, .uml-class-methods-rect {
+    fill: #fdc886;
+    stroke: #fff;
+    stroke-width: 0.5;
 }
