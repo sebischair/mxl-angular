@@ -7,7 +7,10 @@
                     mxlModelElements: '=ngModel',
                     width: '@width',
                     height: '@height',
-                    orientation: '@orientation'
+                    orientation: '@orientation',
+                    nodeSep: '@nodeSep',
+                    edgeSep: '@edgeSep',
+                    rankSep: '@rankSep'
                 },
             link: function ($scope, $element, $attrs, ctrl) {
 
@@ -34,7 +37,13 @@
                             });
                         }
 
-                        buildGraph(graphData, $scope.graph, $scope.orientation ? $scope.orientation : 'LR');
+                        buildGraph(graphData, $scope.graph,
+                            {
+                                orientation: $scope.orientation ? $scope.orientation : 'LR',
+                                nodeSep: $scope.nodeSep ? $scope.nodeSep : 50,
+                                edgeSep: $scope.edgeSep ? $scope.edgeSep : 400,
+                                rankSep: $scope.rankSep ? $scope.rankSep : 50,
+                            });
                     } else {
                         if ($scope.graph) {
                             $scope.graph.clear();
@@ -134,7 +143,7 @@
         return derivedAttributeNode;
     }
 
-    function buildGraph(graphData, graph, direction) {
+    function buildGraph(graphData, graph, graphOptions) {
 
         var uml = joint.shapes.uml;
 
@@ -150,14 +159,14 @@
             var attributeIndex = 0;
 
             var classData = {
-                size: { width: 150, height: 30 },
+                size: { width: 175, height: 30 },
                 name: node.data.name,
                 attributes: [],
                 attrs: {}
             };
 
             _.each(node.attributes, function (a) {
-                classData.attributes.push(a.data.name + ' : ' + a.data.attributeType + '');
+                classData.attributes.push(a.data.name + ' : ' + a.data.attributeType + getMultiplicityString(a.data.multiplicity));
                 classData.size.height += 14;
 
                 if (a.markAsExplicit) {
@@ -190,13 +199,13 @@
 
             classIndex++;
         });
-
+        console.log(graphData);
         var associationIndex = 0;
         _.each(graphData.edges, function (edge) {
             var associationData = {
                 source: { id: classes[edge.source].id },
                 target: { id: classes[edge.target].id },
-                labels: [{ position: 0.5, attrs: { text: { text: edge.data.name } } }],
+                labels: [{ position: 0.5, attrs: { text: { text: edge.data.name + getMultiplicityString(edge.data.multiplicity) } } }],
                 attrs: {
                     '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 L 0 5 L 10 5 L 0 5 z' }
                 }
@@ -228,8 +237,23 @@
         joint.layout.DirectedGraph.layout(graph, {
             setLinkVertices: false,
             nodeSep: 50,
-            edgeSep: 300,
-            rankDir: direction
+            edgeSep: 400,
+            rankSep: 100,
+            rankDir: graphOptions.orientation
         });
-    }    
+    }
+
+    function getMultiplicityString(mult) {
+        if (mult === 'atLeastOne') {
+            return ' [1..*]';
+        } else if (mult === 'maximalOne') {
+            //return '';
+            return ' [0..1]';
+        } else if (mult === 'exactlyOne') {
+            //return '';
+            return ' [1..1]';
+        } else {
+            return ' [0..*]';
+        }
+    }
 })();
