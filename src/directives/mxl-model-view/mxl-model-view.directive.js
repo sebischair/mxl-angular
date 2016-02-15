@@ -35,6 +35,10 @@
                         }
 
                         buildGraph(graphData, $scope.graph, $scope.orientation ? $scope.orientation : 'LR');
+                    } else {
+                        if ($scope.graph) {
+                            $scope.graph.clear();
+                        }
                     }
                 }, true);
             }

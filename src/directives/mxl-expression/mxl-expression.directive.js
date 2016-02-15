@@ -119,6 +119,10 @@
 
                     ctrl.$asyncValidators.typeChecking = function (modelValue, viewValue) {
                         if (viewValue.trim() === "") {
+                            if ($attrs.mxlModelElements) {
+                                delete $scope.mxlModelElements;
+                            }
+
                             return $q.when();
                         }
 

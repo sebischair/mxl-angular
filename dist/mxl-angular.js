@@ -10057,13 +10057,13 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
 })();
 
 (function () {
-    angular.module('mxl').directive('mxlExpression', function ($timeout, $q, mxlModes, scMxl) {
+    angular.module('mxl').directive('mxlExpression', function ($timeout, $q, mxlModes, scMxl, mxlUtil) {
         return {
             require: ["^ngModel"],
             scope:
                 {
                     expression: '=ngModel',
-                    mxlSemantics: '=mxlSemantics',
+                    mxlModelElements: '=mxlModelElements',
                     readOnly: '@mxlReadonly',
                     debounce: '@mxlDebounce',
                     mode: '@mxlMode',
@@ -10177,6 +10177,10 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
 
                     ctrl.$asyncValidators.typeChecking = function (modelValue, viewValue) {
                         if (viewValue.trim() === "") {
+                            if ($attrs.mxlModelElements) {
+                                delete $scope.mxlModelElements;
+                            }
+
                             return $q.when();
                         }
 
@@ -10242,7 +10246,7 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
                     gutters: ["CodeMirror-lint-markers"],
                     lint: true,
                     onlyLimitedHints: $scope.mode !== mxlModes.expression,
-                    debounce: $scope.debounce ? $scope.debounce : 2000,
+                    debounce: $scope.debounce ? $scope.debounce : 1000,
                     theme: 'mxl',
                     extraKeys: {
                         "Ctrl-Space": "autocomplete",
@@ -10282,8 +10286,8 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
 
                     return scMxl.validate(mxlContext, value,
                         function (response) {
-                            if ($attrs.mxlSemantics) {
-                                $scope.mxlSemantics = response.dependencies;
+                            if ($attrs.mxlModelElements) {
+                                $scope.mxlModelElements = mxlUtil.getElementsForModelViewByDependencies(response.dependencies);
                             }
                             updateLints(null);
                             def.resolve();
@@ -11232,21 +11236,22 @@ CodeMirror.defineMIME("application/mxl", {
             require: ["^ngModel"],
             scope:
                 {
-                    mxlSemantics: '=mxlSemantics',
+                    mxlModelElements: '=ngModel',
                     width: '@width',
-                    height: '@height'
+                    height: '@height',
+                    orientation: '@orientation'
                 },
             link: function ($scope, $element, $attrs, ctrl) {
 
-                $scope.$watch('mxlSemantics', function () {
-                    if ($scope.mxlSemantics) {
+                $scope.$watch('mxlModelElements', function () {
+                    if ($scope.mxlModelElements) {
 
                         var graphData = {
                             nodes: {},
                             edges: {}
                         };
 
-                        initiateGraphData($scope.mxlSemantics.dependencies, graphData);
+                        initiateGraphData($scope.mxlModelElements, graphData);
 
                         if (!$scope.graph) {
                             $scope.graph = new joint.dia.Graph();
@@ -11261,54 +11266,50 @@ CodeMirror.defineMIME("application/mxl", {
                             });
                         }
 
-                        buildGraph(graphData, $scope.graph);
+                        buildGraph(graphData, $scope.graph, $scope.orientation ? $scope.orientation : 'LR');
+                    } else {
+                        if ($scope.graph) {
+                            $scope.graph.clear();
+                        }
                     }
                 }, true);
-
-
-
-
             }
         }
     });
 
-    function initiateGraphData(dependencies, graphData) {
-        if (!dependencies) {
-            dependencies = [];
-        }
+    function initiateGraphData(modelElements, graphData) {
+        _.each(modelElements.entityTypes, function (et) {
+            generateEntityType(graphData, et, true);
+        });
 
-        _.each(dependencies, function (dep) {
-            if (dep.entityType) {
-                generateEntityType(graphData, dep.entityType, true);
-            } else if (dep.attributeDefinition) {
-                generateAttributeDefinition(graphData, dep.attributeDefinition, true);
-            } else if (dep.derivedAttributeDefinition) {
-                generateDerivedAttributeDefinition(graphData, dep.derivedAttributeDefinition, true);
-            }
+        _.each(modelElements.attributeDefinitions, function (at) {
+            generateAttributeDefinition(graphData, at, true);
+        });
+
+        _.each(modelElements.derivedAttributeDefinitions, function (dat) {
+            generateDerivedAttributeDefinition(graphData, dat, true);
         });
     }
 
     function generateEntityType(graphData, entityType, addAttributes) {
         var classNode = graphData.nodes[entityType.id];
         if (!classNode) {
-            classNode = { id: entityType.id, data: entityType };
+            classNode = { id: entityType.id, data: entityType, attributes: {}, derivedAttributes: {} };
             graphData.nodes[entityType.id] = classNode;
         }
 
-        if (addAttributes) {
-            classNode.attributes = {};
-            classNode.derivedAttributes = {};
-            _.each(entityType.attributeDefinitions, function (ad) {
-                var attribute = generateAttributeDefinition(graphData, ad);
-                if (!attribute.source) {
-                    classNode.attributes[ad.id] = attribute;
-                }
-            });
+        _.each(entityType.attributeDefinitions, function (ad) {
+            var attribute = generateAttributeDefinition(graphData, ad);
+            if (!attribute.source) {
+                classNode.attributes[ad.id] = attribute;
+            }
+        });
 
-            _.each(entityType.derivedAttributeDefinitions, function (dad) {
-                classNode.derivedAttributes[dad.id] = generateDerivedAttributeDefinition(graphData, dad);
-            });
-        }
+        _.each(entityType.derivedAttributeDefinitions, function (dad) {
+            classNode.derivedAttributes[dad.id] = generateDerivedAttributeDefinition(graphData, dad);
+        });
+        graphData.nodes[entityType.id] = classNode;
+
 
         return classNode;
     }
@@ -11316,17 +11317,16 @@ CodeMirror.defineMIME("application/mxl", {
     function generateAttributeDefinition(graphData, attributeDefinition, markAsExplicit) {
         if (attributeDefinition.attributeType === "Link" && attributeDefinition.options && attributeDefinition.options.entityType) {
             var edge = graphData.edges[attributeDefinition.id];
+            var targetType = attributeDefinition.options.entityType;
 
             if (!edge) {
-                var targetType = attributeDefinition.options.entityType;
-                generateEntityType(graphData, targetType, true);
-
-                graphData.edges[attributeDefinition.id] = { data: attributeDefinition, source: attributeDefinition.entityType.id, target: targetType.id };
+                graphData.edges[attributeDefinition.id] = { data: attributeDefinition, source: attributeDefinition.entityType.id, target: targetType.id, markAsExplicit: false };
                 edge = graphData.edges[attributeDefinition.id];
-            } 
+            }
+
+            generateEntityType(graphData, targetType, true);
 
             edge.markAsExplicit = edge.markAsExplicit || markAsExplicit;
-
             return edge;
 
         } else {
@@ -11338,7 +11338,7 @@ CodeMirror.defineMIME("application/mxl", {
 
             var attributeNode = classNode.attributes[attributeDefinition.id];
             if (!attributeNode) {
-                classNode.attributes[attributeDefinition.id] = { data: attributeDefinition };
+                classNode.attributes[attributeDefinition.id] = { data: attributeDefinition, markAsExplicit: false };
                 attributeNode = classNode.attributes[attributeDefinition.id];
             }
 
@@ -11351,14 +11351,13 @@ CodeMirror.defineMIME("application/mxl", {
     function generateDerivedAttributeDefinition(graphData, derivedAttributeDefinition, markAsExplicit) {
         var classNode = generateEntityType(graphData, derivedAttributeDefinition.entityType);
 
-        if (!classNode.derivedAttributes)
-        {
+        if (!classNode.derivedAttributes) {
             classNode.derivedAttributes = {};
         }
 
         var derivedAttributeNode = classNode.derivedAttributes[derivedAttributeDefinition.id];
         if (!derivedAttributeNode) {
-            classNode.derivedAttributes[derivedAttributeDefinition.id] = { data: derivedAttributeDefinition };
+            classNode.derivedAttributes[derivedAttributeDefinition.id] = { data: derivedAttributeDefinition, markAsExplicit: false };
             derivedAttributeNode = classNode.derivedAttributes[derivedAttributeDefinition.id];
         }
 
@@ -11367,36 +11366,48 @@ CodeMirror.defineMIME("application/mxl", {
         return derivedAttributeNode;
     }
 
-    function buildGraph(graphData, graph) {
+    function buildGraph(graphData, graph, direction) {
 
         var uml = joint.shapes.uml;
 
         var classes = {};
         graph.clear();
 
+        var attributesToBeMarked = [];
+        var associationsToBeMarked = [];
+
+        var classIndex = 0;
+
         _.each(graphData.nodes, function (node) {
+            var attributeIndex = 0;
+
             var classData = {
                 size: { width: 150, height: 30 },
                 name: node.data.name,
                 attributes: [],
-                attrs: {
-                    '.uml-class-attrs-text': {
-                        ref: '.uml-class-attrs-rect',
-                        'ref-y': 0.5,
-                        'y-alignment': 'middle',
-                        'entityType' : node.name
-                    }
-                }
+                attrs: {}
             };
 
             _.each(node.attributes, function (a) {
                 classData.attributes.push(a.data.name + ' : ' + a.data.attributeType + '');
                 classData.size.height += 14;
+
+                if (a.markAsExplicit) {
+                    attributesToBeMarked.push({ c: classIndex, a: attributeIndex });
+                }
+
+                attributeIndex++;
             });
 
             _.each(node.derivedAttributes, function (a) {
-                classData.attributes.push('/' + a.data.name + ' : ' + a.data.inferredAttributeType);
+                classData.attributes.push('/ ' + a.data.name + ' : ' + a.data.inferredAttributeType);
                 classData.size.height += 14;
+
+                if (a.markAsExplicit) {
+                    attributesToBeMarked.push({ c: classIndex, a: attributeIndex });
+                }
+
+                attributeIndex++;
             });
 
             if (classData.attributes.length === 0) {
@@ -11409,20 +11420,48 @@ CodeMirror.defineMIME("application/mxl", {
             classes[node.id] = c;
             graph.addCell(c);
 
+            classIndex++;
         });
 
+        var associationIndex = 0;
         _.each(graphData.edges, function (edge) {
-            graph.addCell(new uml.Association({ source: { id: classes[edge.source].id }, target: { id: classes[edge.target].id }, labels:  [
-        { position: -25, attrs: { text: { text: edge.data.name } }}
-            ]}));
+            var associationData = {
+                source: { id: classes[edge.source].id },
+                target: { id: classes[edge.target].id },
+                labels: [{ position: 0.5, attrs: { text: { text: edge.data.name } } }],
+                attrs: {
+                    '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 L 0 5 L 10 5 L 0 5 z' }
+                }
+            };
+
+            if (edge.markAsExplicit) {
+                associationsToBeMarked.push(associationIndex);
+            }
+
+            graph.addCell(new uml.Association(associationData));
+
+            associationIndex++;
         });
 
-        joint.layout.DirectedGraph.layout(graph, { setLinkVertices: false });
 
-        console.log(classes);
-
-        $('.uml-class-attrs-text:eq(0) tspan:eq(2)').each(function () {
-            $(this).css('font-weight', '1000');
+        _.each(attributesToBeMarked, function (e) {
+            $('.uml-class-attrs-text:eq(' + e.c + ') tspan:eq(' + e.a + ')').each(function () {
+                $(this).css('font-weight', 'bold');
+            });
         });
-    }
+
+        _.each(associationsToBeMarked, function (ai) {
+            $('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + ai + ')').each(function () {
+                $(this).css('font-weight', 'bolder');
+            });
+        });
+
+
+        joint.layout.DirectedGraph.layout(graph, {
+            setLinkVertices: false,
+            nodeSep: 50,
+            edgeSep: 300,
+            rankDir: direction
+        });
+    }    
 })();
