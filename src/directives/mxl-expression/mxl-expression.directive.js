@@ -27,6 +27,10 @@
                     mxlContext.entity = { id: $scope.entityId };
                 }
 
+                if (!mxlContext.workspace && !mxlContext.workspace && !mxlContext.workspace) {
+                    delete mxlContext;
+                }
+
                 function newCodemirrorEditor($element, codemirrorOptions) {
                     var codemirror;
                     $element.html('');
@@ -120,8 +124,8 @@
                     ctrl.$asyncValidators.typeChecking = function (modelValue, viewValue) {
                         if (viewValue.trim() === "") {
                             if ($attrs.mxlModelElements) {
-                                if ($scope.workspaceId) {
-                                    mxlUtil.getElementsForModelViewByWorkspaceId($scope.workspaceId).then(function (elements) {
+                                if (mxlContext) {
+                                    mxlUtil.getElementsForModelViewByMxlContext(mxlContext).then(function (elements) {
                                         $scope.mxlModelElements = elements;
                                     });
                                 } else {
@@ -235,7 +239,9 @@
                     return scMxl.validate(mxlContext, value,
                         function (response) {
                             if ($attrs.mxlModelElements) {
-                                $scope.mxlModelElements = mxlUtil.getElementsForModelViewByDependencies(response.dependencies);
+                                mxlUtil.getElementsForModelViewByDependencies(mxlContext, response.dependencies).then(function (elements) {
+                                    $scope.mxlModelElements = elements;
+                                });
                             }
                             updateLints(null);
                             def.resolve();
