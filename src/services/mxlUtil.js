@@ -1,14 +1,16 @@
 ﻿(function () {
-    angular.module('mxl').service('mxlUtil', function scAuthentication() {
+    angular.module('mxl').service('mxlUtil', function (scModel, $q) {
         return {
-            getElementsForModelViewByDependencies: getElementsForModelViewByDependencies
+            getElementsForModelViewByDependencies: getElementsForModelViewByDependencies,
+            getElementsForModelViewByWorkspaceId: getElementsForModelViewByWorkspaceId
         };
 
         function getElementsForModelViewByDependencies(evaluationResult) {
             var modelElements = {
                 entityTypes: [],
                 attributeDefinitions: [],
-                derivedAttributeDefinitions: []
+                derivedAttributeDefinitions: [],
+                markElements: true
             };
 
             var dependencies = evaluationResult.dependencies;
@@ -28,6 +30,21 @@
             });
 
             return modelElements;
+        }
+
+        function getElementsForModelViewByWorkspaceId(workspaceId) {
+            var def = $q.defer();
+
+            scModel.EntityType.queryByWorkspace({ id: workspaceId, meta: 'associations' }, function (entityTypes) {
+                _.each(entityTypes, function (et) {
+                    et.attributeDefinitions = et.associations;
+                });
+                def.resolve({ entityTypes: entityTypes, markElements: false });
+            }, function (error) {
+                def.reject(error);
+            });
+
+            return def.promise;
         }
     });
 })();

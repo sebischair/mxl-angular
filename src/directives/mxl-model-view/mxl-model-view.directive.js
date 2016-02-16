@@ -56,22 +56,22 @@
 
     function initiateGraphData(modelElements, graphData) {
         _.each(modelElements.entityTypes, function (et) {
-            generateEntityType(graphData, et, true);
+            generateEntityType(graphData, et, true, modelElements.markElements);
         });
 
         _.each(modelElements.attributeDefinitions, function (at) {
-            generateAttributeDefinition(graphData, at, true);
+            generateAttributeDefinition(graphData, at, modelElements.markElements);
         });
 
         _.each(modelElements.derivedAttributeDefinitions, function (dat) {
-            generateDerivedAttributeDefinition(graphData, dat, true);
+            generateDerivedAttributeDefinition(graphData, dat, modelElements.markElements);
         });
     }
 
-    function generateEntityType(graphData, entityType, addAttributes) {
+    function generateEntityType(graphData, entityType, addAttributes, markAsExplicit) {
         var classNode = graphData.nodes[entityType.id];
         if (!classNode) {
-            classNode = { id: entityType.id, data: entityType, attributes: {}, derivedAttributes: {} };
+            classNode = { id: entityType.id, data: entityType, attributes: {}, derivedAttributes: {}, markAsExplicit: false };
             graphData.nodes[entityType.id] = classNode;
         }
 
@@ -85,8 +85,14 @@
         _.each(entityType.derivedAttributeDefinitions, function (dad) {
             classNode.derivedAttributes[dad.id] = generateDerivedAttributeDefinition(graphData, dad);
         });
+
+        _.each(entityType.incomingAssociations, function (ia) {
+            generateIncomingAssociation(graphData, ia);
+        });
+
         graphData.nodes[entityType.id] = classNode;
 
+        classNode.markAsExplicit = classNode.markAsExplicit || markAsExplicit;
 
         return classNode;
     }
@@ -101,13 +107,13 @@
                 edge = graphData.edges[attributeDefinition.id];
             }
 
-            generateEntityType(graphData, targetType, true);
+            generateEntityType(graphData, targetType, false, markAsExplicit);
 
             edge.markAsExplicit = edge.markAsExplicit || markAsExplicit;
             return edge;
 
         } else {
-            var classNode = generateEntityType(graphData, attributeDefinition.entityType);
+            var classNode = generateEntityType(graphData, attributeDefinition.entityType, false, markAsExplicit);
 
             if (!classNode.attributes) {
                 classNode.attributes = {};
@@ -126,7 +132,7 @@
     }
 
     function generateDerivedAttributeDefinition(graphData, derivedAttributeDefinition, markAsExplicit) {
-        var classNode = generateEntityType(graphData, derivedAttributeDefinition.entityType);
+        var classNode = generateEntityType(graphData, derivedAttributeDefinition.entityType, false, markAsExplicit);
 
         if (!classNode.derivedAttributes) {
             classNode.derivedAttributes = {};
@@ -141,6 +147,23 @@
         derivedAttributeNode.markAsExplicit = derivedAttributeNode.markAsExplicit || markAsExplicit;
 
         return derivedAttributeNode;
+    }
+
+    function generateIncomingAssociation(graphData, attributeDefinition) {
+        var edge = graphData.edges[attributeDefinition.id];
+
+        var sourceType = attributeDefinition.entityType;
+        var targetType = attributeDefinition.options.entityType;
+
+        if (!edge) {
+            graphData.edges[attributeDefinition.id] = { data: attributeDefinition, source: sourceType.id, target: targetType.id, markAsExplicit: false };
+            edge = graphData.edges[attributeDefinition.id];
+        }
+
+        generateEntityType(graphData, sourceType);
+
+        return edge;
+
     }
 
     function buildGraph(graphData, graph, graphOptions) {
@@ -162,7 +185,10 @@
                 size: { width: 175, height: 30 },
                 name: node.data.name,
                 attributes: [],
-                attrs: {}
+                attrs:
+                    {
+                        '.uml-class-name-rect': { 'fill': node.markAsExplicit ? '#88C0E8' : '#ccc' }
+                    }
             };
 
             _.each(node.attributes, function (a) {
@@ -199,7 +225,7 @@
 
             classIndex++;
         });
-        console.log(graphData);
+
         var associationIndex = 0;
         _.each(graphData.edges, function (edge) {
             var associationData = {
@@ -233,14 +259,8 @@
             });
         });
 
-
-        joint.layout.DirectedGraph.layout(graph, {
-            setLinkVertices: false,
-            nodeSep: 50,
-            edgeSep: 400,
-            rankSep: 100,
-            rankDir: graphOptions.orientation
-        });
+        //graphOptions.setLinkVertices = false;
+        joint.layout.DirectedGraph.layout(graph, graphOptions);
     }
 
     function getMultiplicityString(mult) {

@@ -10178,7 +10178,13 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
                     ctrl.$asyncValidators.typeChecking = function (modelValue, viewValue) {
                         if (viewValue.trim() === "") {
                             if ($attrs.mxlModelElements) {
-                                delete $scope.mxlModelElements;
+                                if ($scope.workspaceId) {
+                                    mxlUtil.getElementsForModelViewByWorkspaceId($scope.workspaceId).then(function (elements) {
+                                        $scope.mxlModelElements = elements;
+                                    });
+                                } else {
+                                    delete $scope.mxlModelElements;
+                                }
                             }
 
                             return $q.when();
@@ -11239,7 +11245,10 @@ CodeMirror.defineMIME("application/mxl", {
                     mxlModelElements: '=ngModel',
                     width: '@width',
                     height: '@height',
-                    orientation: '@orientation'
+                    orientation: '@orientation',
+                    nodeSep: '@nodeSep',
+                    edgeSep: '@edgeSep',
+                    rankSep: '@rankSep'
                 },
             link: function ($scope, $element, $attrs, ctrl) {
 
@@ -11266,7 +11275,13 @@ CodeMirror.defineMIME("application/mxl", {
                             });
                         }
 
-                        buildGraph(graphData, $scope.graph, $scope.orientation ? $scope.orientation : 'LR');
+                        buildGraph(graphData, $scope.graph,
+                            {
+                                orientation: $scope.orientation ? $scope.orientation : 'LR',
+                                nodeSep: $scope.nodeSep ? $scope.nodeSep : 50,
+                                edgeSep: $scope.edgeSep ? $scope.edgeSep : 400,
+                                rankSep: $scope.rankSep ? $scope.rankSep : 50,
+                            });
                     } else {
                         if ($scope.graph) {
                             $scope.graph.clear();
@@ -11279,22 +11294,22 @@ CodeMirror.defineMIME("application/mxl", {
 
     function initiateGraphData(modelElements, graphData) {
         _.each(modelElements.entityTypes, function (et) {
-            generateEntityType(graphData, et, true);
+            generateEntityType(graphData, et, true, modelElements.markElements);
         });
 
         _.each(modelElements.attributeDefinitions, function (at) {
-            generateAttributeDefinition(graphData, at, true);
+            generateAttributeDefinition(graphData, at, modelElements.markElements);
         });
 
         _.each(modelElements.derivedAttributeDefinitions, function (dat) {
-            generateDerivedAttributeDefinition(graphData, dat, true);
+            generateDerivedAttributeDefinition(graphData, dat, modelElements.markElements);
         });
     }
 
-    function generateEntityType(graphData, entityType, addAttributes) {
+    function generateEntityType(graphData, entityType, addAttributes, markAsExplicit) {
         var classNode = graphData.nodes[entityType.id];
         if (!classNode) {
-            classNode = { id: entityType.id, data: entityType, attributes: {}, derivedAttributes: {} };
+            classNode = { id: entityType.id, data: entityType, attributes: {}, derivedAttributes: {}, markAsExplicit: false };
             graphData.nodes[entityType.id] = classNode;
         }
 
@@ -11308,8 +11323,14 @@ CodeMirror.defineMIME("application/mxl", {
         _.each(entityType.derivedAttributeDefinitions, function (dad) {
             classNode.derivedAttributes[dad.id] = generateDerivedAttributeDefinition(graphData, dad);
         });
+
+        _.each(entityType.incomingAssociations, function (ia) {
+            generateIncomingAssociation(graphData, ia);
+        });
+
         graphData.nodes[entityType.id] = classNode;
 
+        classNode.markAsExplicit = classNode.markAsExplicit || markAsExplicit;
 
         return classNode;
     }
@@ -11324,13 +11345,13 @@ CodeMirror.defineMIME("application/mxl", {
                 edge = graphData.edges[attributeDefinition.id];
             }
 
-            generateEntityType(graphData, targetType, true);
+            generateEntityType(graphData, targetType, false, markAsExplicit);
 
             edge.markAsExplicit = edge.markAsExplicit || markAsExplicit;
             return edge;
 
         } else {
-            var classNode = generateEntityType(graphData, attributeDefinition.entityType);
+            var classNode = generateEntityType(graphData, attributeDefinition.entityType, false, markAsExplicit);
 
             if (!classNode.attributes) {
                 classNode.attributes = {};
@@ -11349,7 +11370,7 @@ CodeMirror.defineMIME("application/mxl", {
     }
 
     function generateDerivedAttributeDefinition(graphData, derivedAttributeDefinition, markAsExplicit) {
-        var classNode = generateEntityType(graphData, derivedAttributeDefinition.entityType);
+        var classNode = generateEntityType(graphData, derivedAttributeDefinition.entityType, false, markAsExplicit);
 
         if (!classNode.derivedAttributes) {
             classNode.derivedAttributes = {};
@@ -11366,7 +11387,24 @@ CodeMirror.defineMIME("application/mxl", {
         return derivedAttributeNode;
     }
 
-    function buildGraph(graphData, graph, direction) {
+    function generateIncomingAssociation(graphData, attributeDefinition) {
+        var edge = graphData.edges[attributeDefinition.id];
+
+        var sourceType = attributeDefinition.entityType;
+        var targetType = attributeDefinition.options.entityType;
+
+        if (!edge) {
+            graphData.edges[attributeDefinition.id] = { data: attributeDefinition, source: sourceType.id, target: targetType.id, markAsExplicit: false };
+            edge = graphData.edges[attributeDefinition.id];
+        }
+
+        generateEntityType(graphData, sourceType);
+
+        return edge;
+
+    }
+
+    function buildGraph(graphData, graph, graphOptions) {
 
         var uml = joint.shapes.uml;
 
@@ -11382,14 +11420,17 @@ CodeMirror.defineMIME("application/mxl", {
             var attributeIndex = 0;
 
             var classData = {
-                size: { width: 150, height: 30 },
+                size: { width: 175, height: 30 },
                 name: node.data.name,
                 attributes: [],
-                attrs: {}
+                attrs:
+                    {
+                        '.uml-class-name-rect': { 'fill': node.markAsExplicit ? '#88C0E8' : '#ccc' }
+                    }
             };
 
             _.each(node.attributes, function (a) {
-                classData.attributes.push(a.data.name + ' : ' + a.data.attributeType + '');
+                classData.attributes.push(a.data.name + ' : ' + a.data.attributeType + getMultiplicityString(a.data.multiplicity));
                 classData.size.height += 14;
 
                 if (a.markAsExplicit) {
@@ -11428,7 +11469,7 @@ CodeMirror.defineMIME("application/mxl", {
             var associationData = {
                 source: { id: classes[edge.source].id },
                 target: { id: classes[edge.target].id },
-                labels: [{ position: 0.5, attrs: { text: { text: edge.data.name } } }],
+                labels: [{ position: 0.5, attrs: { text: { text: edge.data.name + getMultiplicityString(edge.data.multiplicity) } } }],
                 attrs: {
                     '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 L 0 5 L 10 5 L 0 5 z' }
                 }
@@ -11456,12 +11497,21 @@ CodeMirror.defineMIME("application/mxl", {
             });
         });
 
+        //graphOptions.setLinkVertices = false;
+        joint.layout.DirectedGraph.layout(graph, graphOptions);
+    }
 
-        joint.layout.DirectedGraph.layout(graph, {
-            setLinkVertices: false,
-            nodeSep: 50,
-            edgeSep: 300,
-            rankDir: direction
-        });
-    }    
+    function getMultiplicityString(mult) {
+        if (mult === 'atLeastOne') {
+            return ' [1..*]';
+        } else if (mult === 'maximalOne') {
+            //return '';
+            return ' [0..1]';
+        } else if (mult === 'exactlyOne') {
+            //return '';
+            return ' [1..1]';
+        } else {
+            return ' [0..*]';
+        }
+    }
 })();
