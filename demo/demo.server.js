@@ -5,6 +5,6 @@ ceapp.controller('testController', function ($scope, scAuth) {
 
     //$scope.expectedType = 'Number';
     //$scope.mxlParameters = 'list:Sequence<Customer>, map:Function<Customer,Number>';
-    $scope.mxlValue = 'find Order.select(Customer.Turnover)';
+
     $scope.workspaceId = '107yhdgc7q9u6';
 });
