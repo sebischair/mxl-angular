@@ -30,6 +30,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
+    "src",
     "package.json"
   ],
   "dependencies": {

@@ -28,7 +28,7 @@ module.exports = function (grunt) {
                 sourceMap: false
             },
             js: {
-                src: ['src/third-party/code-mirror/*.js', 'src/third-party/code-mirror/addon/*/*.js', 'src/*.js', 'src/serivces/*.js', 'src/directives/*/*.js'],
+                src: ['src/third-party/code-mirror/*.js', 'src/third-party/code-mirror/addon/*/*.js', 'src/*.js', 'src/services/*.js', 'src/directives/*/*.js'],
                 dest: 'dist/<%= pkg.name %>.js'
             },
             css: {
