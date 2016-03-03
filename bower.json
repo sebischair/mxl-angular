@@ -30,8 +30,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "package.json",
-    "src"
+    "package.json"
   ],
   "dependencies": {
     "sc-angular": "*",
