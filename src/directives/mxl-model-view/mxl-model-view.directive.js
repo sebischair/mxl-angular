@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     angular.module('mxl').directive('mxlModelView', function () {
         return {
             require: ["^ngModel"],
@@ -27,7 +27,7 @@
                         if (!$scope.graph) {
                             $scope.graph = new joint.dia.Graph();
 
-                            var paper = new joint.dia.Paper({
+                            $scope.paper = new joint.dia.Paper({
                                 el: $element,
                                 width: $scope.width,
                                 height: $scope.height,
@@ -44,6 +44,13 @@
                                 edgeSep: $scope.edgeSep ? $scope.edgeSep : 200,
                                 rankSep: $scope.rankSep ? $scope.rankSep : 50,
                             });
+
+                        var dims = $scope.graph.getBBox($scope.graph.getElements());
+
+                        if (dims.width > $scope.width) {
+                            $scope.paper.scale(($scope.width / dims.width));
+                        }
+
                     } else {
                         if ($scope.graph) {
                             $scope.graph.clear();
