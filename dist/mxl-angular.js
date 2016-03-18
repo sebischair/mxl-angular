@@ -11411,9 +11411,8 @@ CodeMirror.defineMIME("application/mxl", {
                                 rankSep: $scope.rankSep ? $scope.rankSep : 50,
                             });
                         var dims = $scope.graph.getBBox($scope.graph.getElements());
-                        console.log(dims);
-                        console.log($scope.width);
-                        if(dims.width > $scope.width){
+
+                        if(dims && dims.width > $scope.width){
                             $scope.paper.scale(($scope.width/dims.width));
                         }
                         
