@@ -28,49 +28,25 @@
 
 </head>
 <body ng-app="ceapp">
-    <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
-        <div class="container">
-            <h1>This is a Simple Page for Demonstrating the MxL Code Editor</h1>
-        </div>
-    </header>
-
+   
     <div class="container">
         <div ng-controller="testController" style="margin:5px;" ng-form name="form">
 
             <div class="row">
 
                 <div class="col-md-5">
-                    <h2>Try your Expression</h2>
-
-                    <mxl-expression class="mxl-form-control" mxl-model-elements="staticSemantics" name="mxlValue" ng-model="mxlValue" sc-workspace="{{workspaceId}}" mxl-expected="{{expectedType}}" mxl-parameters="{{mxlParameters}}"></mxl-expression>
+                    <h2>Query editor</h2>
+                    <br />
+                    <mxl-expression class="mxl-form-control" style="height:200px;" mxl-model-elements="staticSemantics" name="mxlValue" ng-model="mxlValue" sc-workspace="{{workspaceId}}" mxl-expected="{{expectedType}}" mxl-parameters="{{mxlParameters}}"></mxl-expression>
                     <span ng-show="form.mxlValue.$error.typeChecking">There is an MxL error</span>
-                    <h2>Settings</h2>
-                    <h4>Expected Type</h4>
-                    <p>
-                        <mxl-expression class="mxl-form-control" name="expectedType" ng-model="expectedType" mxl-mode="type" sc-workspace="{{workspaceId}}"></mxl-expression>
-                        <span ng-show="form.expectedType.$error.typeChecking">There is an MxL error</span>
-                    </p>
-                    <h4>Parameters</h4>
-                    <p>
-                        <mxl-expression class="mxl-form-control" name="mxlParameters" ng-model="mxlParameters" mxl-mode="parameters" sc-workspace="{{workspaceId}}" ></mxl-expression>
-                        <span ng-show="form.mxlParameters.$error.typeChecking">There is an MxL error</span>
-                    </p>
+                    
                 </div>
                 
                 <div class="col-md-7">
-                    <mxl-model-view ng-model="staticSemantics" width="800" height="1000" orientation="LR"></mxl-model-view>
-                    <h4>Some Tips</h4>
-                    <p>
-                        <ul>
-                            <li>
-                                Press Ctrl+Space to trigger auto-completion.
-                            </li>
-                            <li>
-                                Press Ctrl+Enter for a trial evaluation of the expression.
-                            </li>
-
-                        </ul>
-                    </p>
+                    <h2>Model view</h2>
+                    <br />
+                    <mxl-model-view ng-model="staticSemantics" width="800" height="400" orientation="TB"></mxl-model-view>
+                    
                 </div>
             </div>
 

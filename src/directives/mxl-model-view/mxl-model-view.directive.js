@@ -39,17 +39,18 @@
 
                         buildGraph(graphData, $scope.graph,
                             {
-                                orientation: $scope.orientation ? $scope.orientation : 'LR',
-                                nodeSep: $scope.nodeSep ? $scope.nodeSep : 50,
-                                edgeSep: $scope.edgeSep ? $scope.edgeSep : 400,
+                                rankDir: $scope.orientation ? $scope.orientation : 'LR',
+                                nodeSep: $scope.nodeSep ? $scope.nodeSep : 100,
+                                edgeSep: $scope.edgeSep ? $scope.edgeSep : 200,
                                 rankSep: $scope.rankSep ? $scope.rankSep : 50,
                             });
+
                         var dims = $scope.graph.getBBox($scope.graph.getElements());
 
                         if(dims && dims.width > $scope.width){
                             $scope.paper.scale(($scope.width/dims.width));
                         }
-                        
+
                     } else {
                         if ($scope.graph) {
                             $scope.graph.clear();
@@ -188,7 +189,7 @@
             var attributeIndex = 0;
 
             var classData = {
-                size: { width: 175, height: 30 },
+                size: { width: 200, height: 30 },
                 name: node.data.name,
                 attributes: [],
                 attrs:
@@ -265,7 +266,11 @@
             });
         });
 
-        //graphOptions.setLinkVertices = false;
+        graphOptions.setLinkVertices = true;
+        graphOptions.setVertices = function (link, vertices) {
+            vertices = vertices.splice(1, vertices.length - 2);
+            link.set('vertices', vertices);
+        };
         joint.layout.DirectedGraph.layout(graph, graphOptions);
     }
 

@@ -657,6 +657,10 @@ li.CodeMirror-hint-active {
     display: none;
 }
 
+.marker-vertex-group {
+    display: none;
+}
+
 .uml-class-methods-rect {
     display: none;
 }
