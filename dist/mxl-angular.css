@@ -692,4 +692,5 @@ li.CodeMirror-hint-active {
 g.label > text > tspan {
     font-size: 13px;
     font-weight: normal;
+    fill:black;
 }
