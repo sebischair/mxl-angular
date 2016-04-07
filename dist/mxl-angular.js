@@ -10419,9 +10419,15 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
                     return scMxl.validate(mxlContext, value,
                         function (response) {
                             if ($attrs.mxlModelElements) {
-                                mxlUtil.getElementsForModelViewByDependencies(mxlContext, response.dependencies).then(function (elements) {
-                                    $scope.mxlModelElements = elements;
-                                });
+                                if (response.dependencies.dependencies) {
+                                    mxlUtil.getElementsForModelViewByDependencies(mxlContext, response.dependencies).then(function (elements) {
+                                        $scope.mxlModelElements = elements;
+                                    });
+                                } else {
+                                    mxlUtil.getElementsForModelViewByMxlContext(mxlContext).then(function (elements) {
+                                        $scope.mxlModelElements = elements;
+                                    });
+                                }
                             }
                             updateLints(null);
                             def.resolve();
