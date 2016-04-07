@@ -11413,8 +11413,8 @@ CodeMirror.defineMIME("application/mxl", {
 
                         var dims = $scope.graph.getBBox($scope.graph.getElements());
 
-                        if (dims.width > $scope.width) {
-                            $scope.paper.scale(($scope.width / dims.width));
+                        if(dims && dims.width > $scope.width){
+                            $scope.paper.scale(($scope.width/dims.width));
                         }
 
                     } else {
