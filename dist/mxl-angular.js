@@ -11374,21 +11374,19 @@ CodeMirror.defineMIME("application/mxl", {
     angular.module('mxl').directive('mxlModelView', function () {
         return {
             require: ["^ngModel"],
-            scope:
-                {
-                    mxlModelElements: '=ngModel',
-                    width: '@width',
-                    height: '@height',
-                    orientation: '@orientation',
-                    nodeSep: '@nodeSep',
-                    edgeSep: '@edgeSep',
-                    rankSep: '@rankSep'
-                },
+            scope: {
+                mxlModelElements: '=ngModel',
+                width: '@width',
+                height: '@height',
+                orientation: '@orientation',
+                nodeSep: '@nodeSep',
+                edgeSep: '@edgeSep',
+                rankSep: '@rankSep'
+            },
             link: function ($scope, $element, $attrs, ctrl) {
 
                 $scope.$watch('mxlModelElements', function () {
                     if ($scope.mxlModelElements) {
-
                         var graphData = {
                             nodes: {},
                             edges: {}
@@ -11405,23 +11403,20 @@ CodeMirror.defineMIME("application/mxl", {
                                 height: $scope.height,
                                 gridSize: 1,
                                 model: $scope.graph,
-                                interactive: false
-                            });
-                        }
-
-                        buildGraph(graphData, $scope.graph,
-                            {
-                                rankDir: $scope.orientation ? $scope.orientation : 'LR',
-                                nodeSep: $scope.nodeSep ? $scope.nodeSep : 100,
-                                edgeSep: $scope.edgeSep ? $scope.edgeSep : 200,
-                                rankSep: $scope.rankSep ? $scope.rankSep : 50,
+                                interactive: false,
                             });
 
-                        var dims = $scope.graph.getBBox($scope.graph.getElements());
-
-                        if(dims && dims.width > $scope.width){
-                            $scope.paper.scale(($scope.width/dims.width));
                         }
+
+                        buildGraph(graphData, $scope.graph, {
+                            rankDir: $scope.orientation ? $scope.orientation : 'LR',
+                            nodeSep: $scope.nodeSep ? $scope.nodeSep : 100,
+                            edgeSep: $scope.edgeSep ? $scope.edgeSep : 200,
+                            rankSep: $scope.rankSep ? $scope.rankSep : 50,
+                        });
+
+                        scaleDimensions($scope.paper, $scope.width, $scope.height, 20);
+
 
                     } else {
                         if ($scope.graph) {
@@ -11432,6 +11427,29 @@ CodeMirror.defineMIME("application/mxl", {
             }
         }
     });
+
+    function scaleDimensions(paper, width, height, padding) {
+        var dims = paper.getContentBBox(); //$scope.graph.getBBox($scope.graph.getElements());
+        var containerWidth = width - 2 * padding;
+        var containerHeight = height - 2 * padding;
+        var contentWidth = dims.width;
+        var contentHeight = dims.height;
+        var scaleFactor = Math.min(containerWidth / contentWidth, containerHeight / contentHeight);
+        var translate = {
+            x: (width - contentWidth) / 2,
+            y: (height - contentHeight) / 2
+        };
+
+        if (dims && (contentWidth > containerWidth || contentHeight > containerHeight)) {
+            paper.scale(scaleFactor);
+            translate = {
+                x: (width - contentWidth * scaleFactor) / 2,
+                y: (height - contentHeight * scaleFactor) / 2
+            };
+        }
+
+        paper.setOrigin(translate.x, translate.y);
+    }
 
     function initiateGraphData(modelElements, graphData) {
         _.each(modelElements.entityTypes, function (et) {
