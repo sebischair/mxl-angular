@@ -11406,6 +11406,40 @@ CodeMirror.defineMIME("application/mxl", {
                                 interactive: false,
                             });
 
+                            $scope.paper.$el.on('mousewheel DOMMouseScroll', function onMouseWheel(e) {
+
+                                e.preventDefault();
+                                e = e.originalEvent;
+
+                                var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) / 50;
+                                var offsetX = (e.offsetX || e.clientX - $(this).offset().left);
+                                var offsetY = (e.offsetY || e.clientY - $(this).offset().top);
+
+                                var p = offsetToLocalPoint(offsetX, offsetY, $scope.paper);
+                                var newScale = V($scope.paper.viewport).scale().sx + delta;
+
+                                if (newScale > 0.4 && newScale < 2) {
+                                    $scope.paper.setOrigin(0, 0);
+                                    $scope.paper.scale(newScale, newScale, p.x, p.y);
+                                }
+                            });
+
+                            $scope.paper.$el.on('mousedown', function onMouseDown(e) {
+                                $scope.pressed = 1;
+                                $scope.lastClientX = e.clientX;
+                                $scope.lastClientY = e.clientY;
+                            });
+
+                            $scope.paper.$el.on('mouseup', function onMouseUp(e) {
+                                $scope.pressed = 0;
+                            });
+
+                            $scope.paper.$el.on('mousemove', function onMouseMove(e) {
+                                if($scope.pressed == 1) {
+                                    $scope.paper.setOrigin($scope.paper.options.origin.x - $scope.lastClientX + ($scope.lastClientX = e.clientX), $scope.paper.options.origin.y - $scope.lastClientY + ($scope.lastClientY = e.clientY));
+                                }
+                            });
+
                         }
 
                         buildGraph(graphData, $scope.graph, {
@@ -11427,6 +11461,15 @@ CodeMirror.defineMIME("application/mxl", {
             }
         }
     });
+
+    function offsetToLocalPoint(x, y, paper) {
+        var svgPoint = paper.svg.createSVGPoint();
+        svgPoint.x = x;
+        svgPoint.y = y;
+
+        var pointTransformed = svgPoint.matrixTransform(paper.viewport.getCTM().inverse());
+        return pointTransformed;
+    }
 
     function scaleDimensions(paper, width, height, padding) {
         var dims = paper.getContentBBox(); //$scope.graph.getBBox($scope.graph.getElements());
