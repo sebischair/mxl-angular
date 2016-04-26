@@ -34,7 +34,7 @@
     "package.json"
   ],
   "dependencies": {
-    "sc-angular": "*",
+    "sc-angular": "master",
     "lodash": "*",
     "joint": "*"
   }
