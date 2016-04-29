@@ -11632,7 +11632,10 @@ CodeMirror.defineMIME("application/mxl", {
             };
 
             _.each(node.attributes, function (a) {
-                classData.attributes.push(a.data.name + ' : ' + a.data.attributeType + getMultiplicityString(a.data.multiplicity));
+                var name = a.data.name + ' : ' + a.data.attributeType + getMultiplicityString(a.data.multiplicity);
+                name = joint.util.breakText(name, { width: classData.size.width });
+
+                classData.attributes.push(name);
                 classData.size.height += 14;
 
                 if (a.markAsExplicit) {
