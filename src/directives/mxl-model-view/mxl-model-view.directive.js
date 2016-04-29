@@ -63,7 +63,7 @@
                             });
 
                             $scope.paper.$el.on('mousemove', function onMouseMove(e) {
-                                if($scope.pressed == 1) {
+                                if ($scope.pressed == 1) {
                                     $scope.paper.setOrigin($scope.paper.options.origin.x - $scope.lastClientX + ($scope.lastClientX = e.clientX), $scope.paper.options.origin.y - $scope.lastClientY + ($scope.lastClientY = e.clientY));
                                 }
                             });
@@ -139,7 +139,13 @@
     function generateEntityType(graphData, entityType, addAttributes, markAsExplicit) {
         var classNode = graphData.nodes[entityType.id];
         if (!classNode) {
-            classNode = { id: entityType.id, data: entityType, attributes: {}, derivedAttributes: {}, markAsExplicit: false };
+            classNode = {
+                id: entityType.id,
+                data: entityType,
+                attributes: {},
+                derivedAttributes: {},
+                markAsExplicit: false
+            };
             graphData.nodes[entityType.id] = classNode;
         }
 
@@ -171,7 +177,12 @@
             var targetType = attributeDefinition.options.entityType;
 
             if (!edge) {
-                graphData.edges[attributeDefinition.id] = { data: attributeDefinition, source: attributeDefinition.entityType.id, target: targetType.id, markAsExplicit: false };
+                graphData.edges[attributeDefinition.id] = {
+                    data: attributeDefinition,
+                    source: attributeDefinition.entityType.id,
+                    target: targetType.id,
+                    markAsExplicit: false
+                };
                 edge = graphData.edges[attributeDefinition.id];
             }
 
@@ -189,7 +200,7 @@
 
             var attributeNode = classNode.attributes[attributeDefinition.id];
             if (!attributeNode) {
-                classNode.attributes[attributeDefinition.id] = { data: attributeDefinition, markAsExplicit: false };
+                classNode.attributes[attributeDefinition.id] = {data: attributeDefinition, markAsExplicit: false};
                 attributeNode = classNode.attributes[attributeDefinition.id];
             }
 
@@ -208,7 +219,10 @@
 
         var derivedAttributeNode = classNode.derivedAttributes[derivedAttributeDefinition.id];
         if (!derivedAttributeNode) {
-            classNode.derivedAttributes[derivedAttributeDefinition.id] = { data: derivedAttributeDefinition, markAsExplicit: false };
+            classNode.derivedAttributes[derivedAttributeDefinition.id] = {
+                data: derivedAttributeDefinition,
+                markAsExplicit: false
+            };
             derivedAttributeNode = classNode.derivedAttributes[derivedAttributeDefinition.id];
         }
 
@@ -224,7 +238,12 @@
         var targetType = attributeDefinition.options.entityType;
 
         if (!edge) {
-            graphData.edges[attributeDefinition.id] = { data: attributeDefinition, source: sourceType.id, target: targetType.id, markAsExplicit: false };
+            graphData.edges[attributeDefinition.id] = {
+                data: attributeDefinition,
+                source: sourceType.id,
+                target: targetType.id,
+                markAsExplicit: false
+            };
             edge = graphData.edges[attributeDefinition.id];
         }
 
@@ -250,24 +269,27 @@
             var attributeIndex = 0;
 
             var classData = {
-                size: { width: 200, height: 30 },
+                size: {width: 200, height: 30},
                 name: node.data.name,
                 attributes: [],
-                attrs:
-                    {
-                        '.uml-class-name-rect': { 'fill': node.markAsExplicit ? '#88C0E8' : '#ccc' }
-                    }
+                attrs: {
+                    '.uml-class-name-rect': {'fill': node.markAsExplicit ? '#88C0E8' : '#ccc'}
+                }
             };
 
             _.each(node.attributes, function (a) {
                 var name = a.data.name + ' : ' + a.data.attributeType + getMultiplicityString(a.data.multiplicity);
-                name = joint.util.breakText(name, { width: classData.size.width });
+                name = joint.util.breakText(name, {width: classData.size.width});
+                if (name.indexOf("\n") > -1) {
+                    name = name.substring(0, name.indexOf("\n") - 3);
+                    name = name + '...';
+                }
 
                 classData.attributes.push(name);
                 classData.size.height += 14;
 
                 if (a.markAsExplicit) {
-                    attributesToBeMarked.push({ c: classIndex, a: attributeIndex });
+                    attributesToBeMarked.push({c: classIndex, a: attributeIndex});
                 }
 
                 attributeIndex++;
@@ -278,16 +300,16 @@
                 classData.size.height += 14;
 
                 if (a.markAsExplicit) {
-                    attributesToBeMarked.push({ c: classIndex, a: attributeIndex });
+                    attributesToBeMarked.push({c: classIndex, a: attributeIndex});
                 }
 
                 attributeIndex++;
             });
 
             if (classData.attributes.length === 0) {
-                classData.attrs['.uml-class-attrs-rect'] = { 'display': 'none' };
+                classData.attrs['.uml-class-attrs-rect'] = {'display': 'none'};
             } else {
-                classData.attrs['.uml-class-attrs-rect'] = { 'display': 'inherit' };
+                classData.attrs['.uml-class-attrs-rect'] = {'display': 'inherit'};
             }
 
             var c = new uml.Class(classData);
@@ -300,11 +322,14 @@
         var associationIndex = 0;
         _.each(graphData.edges, function (edge) {
             var associationData = {
-                source: { id: classes[edge.source].id },
-                target: { id: classes[edge.target].id },
-                labels: [{ position: 0.5, attrs: { text: { text: edge.data.name + getMultiplicityString(edge.data.multiplicity) } } }],
+                source: {id: classes[edge.source].id},
+                target: {id: classes[edge.target].id},
+                labels: [{
+                    position: 0.5,
+                    attrs: {text: {text: edge.data.name + getMultiplicityString(edge.data.multiplicity)}}
+                }],
                 attrs: {
-                    '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 L 0 5 L 10 5 L 0 5 z' }
+                    '.marker-target': {d: 'M 10 0 L 0 5 L 10 10 L 0 5 L 10 5 L 0 5 z'}
                 }
             };
 
