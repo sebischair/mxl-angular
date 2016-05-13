@@ -11444,8 +11444,8 @@ CodeMirror.defineMIME("application/mxl", {
 
                         buildGraph(graphData, $scope.graph, {
                             rankDir: $scope.orientation ? $scope.orientation : 'LR',
-                            nodeSep: $scope.nodeSep ? $scope.nodeSep : 100,
-                            edgeSep: $scope.edgeSep ? $scope.edgeSep : 200,
+                            nodeSep: $scope.nodeSep ? $scope.nodeSep : 200,
+                            edgeSep: $scope.edgeSep ? $scope.edgeSep : 100,
                             rankSep: $scope.rankSep ? $scope.rankSep : 50,
                         });
 
@@ -11697,12 +11697,16 @@ CodeMirror.defineMIME("application/mxl", {
                 source: {id: classes[edge.source].id},
                 target: {id: classes[edge.target].id},
                 labels: [{
-                    position: 0.5,
+                    position: -20,
                     attrs: {text: {text: edge.data.name + getMultiplicityString(edge.data.multiplicity)}}
-                }],
-                attrs: {
-                    '.marker-target': {d: 'M 10 0 L 0 5 L 10 10 L 0 5 L 10 5 L 0 5 z'}
-                }
+                }, {
+                    position: 20,
+                    attrs: { text: { text: (edge.data.options.inverseRoleName ? edge.data.options.inverseRoleName + ' ' : '') + '[*]' } }
+                }]
+                //,
+                //attrs: {
+                //    '.marker-target': {d: 'M 10 0 L 0 5 L 10 10 L 0 5 L 10 5 L 0 5 z'}
+                //}
             };
 
             if (edge.markAsExplicit) {
@@ -11711,7 +11715,7 @@ CodeMirror.defineMIME("application/mxl", {
 
             graph.addCell(new uml.Association(associationData));
 
-            associationIndex++;
+            associationIndex+=2;
         });
 
 
@@ -11723,6 +11727,10 @@ CodeMirror.defineMIME("application/mxl", {
 
         _.each(associationsToBeMarked, function (ai) {
             $('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + ai + ')').each(function () {
+                $(this).css('font-weight', 'bolder');
+            });
+
+            $('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + (ai + 1) + ')').each(function () {
                 $(this).css('font-weight', 'bolder');
             });
         });
