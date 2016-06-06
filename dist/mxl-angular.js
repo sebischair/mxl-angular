@@ -10197,18 +10197,23 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
                 },
             link: function ($scope, $element, $attrs, ctrl) {
                 var mxlContext = {};
-                if ($scope.workspaceId) {
-                    mxlContext.workspace = { id: $scope.workspaceId };
-                }
-                if ($scope.entityTypeId) {
-                    mxlContext.entityType = { id: $scope.entityTypeId };
-                }
-                if ($scope.entityId) {
-                    mxlContext.entity = { id: $scope.entityId };
-                }
 
-                if (!mxlContext.workspace && !mxlContext.workspace && !mxlContext.workspace) {
-                    delete mxlContext;
+                loadMxlContext();
+
+                function loadMxlContext() {
+                    if ($scope.workspaceId) {
+                        mxlContext.workspace = { id: $scope.workspaceId };
+                    }
+                    if ($scope.entityTypeId) {
+                        mxlContext.entityType = { id: $scope.entityTypeId };
+                    }
+                    if ($scope.entityId) {
+                        mxlContext.entity = { id: $scope.entityId };
+                    }
+
+                    if (!mxlContext.workspace && !mxlContext.workspace && !mxlContext.workspace) {
+                        delete mxlContext;
+                    }
                 }
 
                 function newCodemirrorEditor($element, codemirrorOptions) {
@@ -10288,6 +10293,18 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
                     });
                 }
 
+                function loadModelViewByMxlContext() {
+                    if ($attrs.mxlModelElements) {
+                        if (mxlContext) {
+                            mxlUtil.getElementsForModelViewByMxlContext(mxlContext).then(function (elements) {
+                                $scope.mxlModelElements = elements;
+                            });
+                        } else {
+                            delete $scope.mxlModelElements;
+                        }
+                    }
+                }
+
                 function configNgModelLink(codemirror, ctrl, $scope) {
 
                     ctrl.$formatters.push(function (value) {
@@ -10303,15 +10320,7 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
 
                     ctrl.$asyncValidators.typeChecking = function (modelValue, viewValue) {
                         if (viewValue.trim() === "") {
-                            if ($attrs.mxlModelElements) {
-                                if (mxlContext) {
-                                    mxlUtil.getElementsForModelViewByMxlContext(mxlContext).then(function (elements) {
-                                        $scope.mxlModelElements = elements;
-                                    });
-                                } else {
-                                    delete $scope.mxlModelElements;
-                                }
-                            }
+                            loadModelViewByMxlContext();
 
                             return $q.when();
                         }
@@ -10459,13 +10468,25 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
 
                 configNgModelLink($scope.codemirror, ctrl[0], $scope);
 
-                scMxl.autoComplete(mxlContext, function (response) {
-                    CodeMirror.commands.autocomplete = function (cmeditor) {
-                        var autoCompletionOptions = { completeSingle: false };
-                        cmeditor.options.additionalAutoCompletionHints = response;
-                        CodeMirror.showHint(cmeditor, CodeMirror.hint.mxl, autoCompletionOptions);
-                    };
+                loadAutoCompletionHints();
+
+                $scope.$watch('workspaceId', function () {
+                    loadMxlContext();
+                    loadAutoCompletionHints();
+                    loadModelViewByMxlContext();
                 });
+
+                function loadAutoCompletionHints() {
+                    scMxl.autoComplete(mxlContext, function (response) {
+                        $scope.codemirror.additionalAutoCompletionHints = response;
+                    });
+                }
+
+                CodeMirror.commands.autocomplete = function (cmeditor) {
+                    var autoCompletionOptions = { completeSingle: false };
+                    cmeditor.options.additionalAutoCompletionHints = cmeditor.additionalAutoCompletionHints;
+                    CodeMirror.showHint(cmeditor, CodeMirror.hint.mxl, autoCompletionOptions);
+                };
             }
         }
     });
@@ -11442,7 +11463,7 @@ CodeMirror.defineMIME("application/mxl", {
 
                         }
 
-                        buildGraph(graphData, $scope.graph, {
+                        buildGraph(graphData, $scope.graph, $element, {
                             rankDir: $scope.orientation ? $scope.orientation : 'LR',
                             nodeSep: $scope.nodeSep ? $scope.nodeSep : 200,
                             edgeSep: $scope.edgeSep ? $scope.edgeSep : 100,
@@ -11557,8 +11578,9 @@ CodeMirror.defineMIME("application/mxl", {
                 };
                 edge = graphData.edges[attributeDefinition.id];
             }
-
-            generateEntityType(graphData, targetType, false, markAsExplicit);
+            
+            generateEntityType(graphData, attributeDefinition.entityType, true, markAsExplicit);
+            generateEntityType(graphData, targetType, true, markAsExplicit);
 
             edge.markAsExplicit = edge.markAsExplicit || markAsExplicit;
             return edge;
@@ -11625,7 +11647,7 @@ CodeMirror.defineMIME("application/mxl", {
 
     }
 
-    function buildGraph(graphData, graph, graphOptions) {
+    function buildGraph(graphData, graph, rootElement, graphOptions) {
 
         var uml = joint.shapes.uml;
 
@@ -11720,17 +11742,17 @@ CodeMirror.defineMIME("application/mxl", {
 
 
         _.each(attributesToBeMarked, function (e) {
-            $('.uml-class-attrs-text:eq(' + e.c + ') tspan:eq(' + e.a + ')').each(function () {
+            $(rootElement).find('.uml-class-attrs-text:eq(' + e.c + ') tspan:eq(' + e.a + ')').each(function () {
                 $(this).css('font-weight', 'bold');
             });
         });
 
         _.each(associationsToBeMarked, function (ai) {
-            $('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + ai + ')').each(function () {
+            $(rootElement).find('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + ai + ')').each(function () {
                 $(this).css('font-weight', 'bolder');
             });
 
-            $('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + (ai + 1) + ')').each(function () {
+            $(rootElement).find('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + (ai + 1) + ')').each(function () {
                 $(this).css('font-weight', 'bolder');
             });
         });

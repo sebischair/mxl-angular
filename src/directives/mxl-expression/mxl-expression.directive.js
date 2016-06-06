@@ -17,18 +17,23 @@
                 },
             link: function ($scope, $element, $attrs, ctrl) {
                 var mxlContext = {};
-                if ($scope.workspaceId) {
-                    mxlContext.workspace = { id: $scope.workspaceId };
-                }
-                if ($scope.entityTypeId) {
-                    mxlContext.entityType = { id: $scope.entityTypeId };
-                }
-                if ($scope.entityId) {
-                    mxlContext.entity = { id: $scope.entityId };
-                }
 
-                if (!mxlContext.workspace && !mxlContext.workspace && !mxlContext.workspace) {
-                    delete mxlContext;
+                loadMxlContext();
+
+                function loadMxlContext() {
+                    if ($scope.workspaceId) {
+                        mxlContext.workspace = { id: $scope.workspaceId };
+                    }
+                    if ($scope.entityTypeId) {
+                        mxlContext.entityType = { id: $scope.entityTypeId };
+                    }
+                    if ($scope.entityId) {
+                        mxlContext.entity = { id: $scope.entityId };
+                    }
+
+                    if (!mxlContext.workspace && !mxlContext.workspace && !mxlContext.workspace) {
+                        delete mxlContext;
+                    }
                 }
 
                 function newCodemirrorEditor($element, codemirrorOptions) {
@@ -108,6 +113,18 @@
                     });
                 }
 
+                function loadModelViewByMxlContext() {
+                    if ($attrs.mxlModelElements) {
+                        if (mxlContext) {
+                            mxlUtil.getElementsForModelViewByMxlContext(mxlContext).then(function (elements) {
+                                $scope.mxlModelElements = elements;
+                            });
+                        } else {
+                            delete $scope.mxlModelElements;
+                        }
+                    }
+                }
+
                 function configNgModelLink(codemirror, ctrl, $scope) {
 
                     ctrl.$formatters.push(function (value) {
@@ -123,15 +140,7 @@
 
                     ctrl.$asyncValidators.typeChecking = function (modelValue, viewValue) {
                         if (viewValue.trim() === "") {
-                            if ($attrs.mxlModelElements) {
-                                if (mxlContext) {
-                                    mxlUtil.getElementsForModelViewByMxlContext(mxlContext).then(function (elements) {
-                                        $scope.mxlModelElements = elements;
-                                    });
-                                } else {
-                                    delete $scope.mxlModelElements;
-                                }
-                            }
+                            loadModelViewByMxlContext();
 
                             return $q.when();
                         }
@@ -279,13 +288,25 @@
 
                 configNgModelLink($scope.codemirror, ctrl[0], $scope);
 
-                scMxl.autoComplete(mxlContext, function (response) {
-                    CodeMirror.commands.autocomplete = function (cmeditor) {
-                        var autoCompletionOptions = { completeSingle: false };
-                        cmeditor.options.additionalAutoCompletionHints = response;
-                        CodeMirror.showHint(cmeditor, CodeMirror.hint.mxl, autoCompletionOptions);
-                    };
+                loadAutoCompletionHints();
+
+                $scope.$watch('workspaceId', function () {
+                    loadMxlContext();
+                    loadAutoCompletionHints();
+                    loadModelViewByMxlContext();
                 });
+
+                function loadAutoCompletionHints() {
+                    scMxl.autoComplete(mxlContext, function (response) {
+                        $scope.codemirror.additionalAutoCompletionHints = response;
+                    });
+                }
+
+                CodeMirror.commands.autocomplete = function (cmeditor) {
+                    var autoCompletionOptions = { completeSingle: false };
+                    cmeditor.options.additionalAutoCompletionHints = cmeditor.additionalAutoCompletionHints;
+                    CodeMirror.showHint(cmeditor, CodeMirror.hint.mxl, autoCompletionOptions);
+                };
             }
         }
     });

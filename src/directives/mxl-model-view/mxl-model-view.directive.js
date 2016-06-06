@@ -70,7 +70,7 @@
 
                         }
 
-                        buildGraph(graphData, $scope.graph, {
+                        buildGraph(graphData, $scope.graph, $element, {
                             rankDir: $scope.orientation ? $scope.orientation : 'LR',
                             nodeSep: $scope.nodeSep ? $scope.nodeSep : 200,
                             edgeSep: $scope.edgeSep ? $scope.edgeSep : 100,
@@ -185,8 +185,9 @@
                 };
                 edge = graphData.edges[attributeDefinition.id];
             }
-
-            generateEntityType(graphData, targetType, false, markAsExplicit);
+            
+            generateEntityType(graphData, attributeDefinition.entityType, true, markAsExplicit);
+            generateEntityType(graphData, targetType, true, markAsExplicit);
 
             edge.markAsExplicit = edge.markAsExplicit || markAsExplicit;
             return edge;
@@ -253,7 +254,7 @@
 
     }
 
-    function buildGraph(graphData, graph, graphOptions) {
+    function buildGraph(graphData, graph, rootElement, graphOptions) {
 
         var uml = joint.shapes.uml;
 
@@ -348,17 +349,17 @@
 
 
         _.each(attributesToBeMarked, function (e) {
-            $('.uml-class-attrs-text:eq(' + e.c + ') tspan:eq(' + e.a + ')').each(function () {
+            $(rootElement).find('.uml-class-attrs-text:eq(' + e.c + ') tspan:eq(' + e.a + ')').each(function () {
                 $(this).css('font-weight', 'bold');
             });
         });
 
         _.each(associationsToBeMarked, function (ai) {
-            $('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + ai + ')').each(function () {
+            $(rootElement).find('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + ai + ')').each(function () {
                 $(this).css('font-weight', 'bolder');
             });
 
-            $('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + (ai + 1) + ')').each(function () {
+            $(rootElement).find('.uml.Association.link > g.labels > g.label > text > tspan:eq(' + (ai + 1) + ')').each(function () {
                 $(this).css('font-weight', 'bolder');
             });
         });
