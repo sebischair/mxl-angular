@@ -40,15 +40,10 @@
                                 e = e.originalEvent;
 
                                 var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) / 50;
-                                var offsetX = (e.offsetX || e.clientX - $(this).offset().left);
-                                var offsetY = (e.offsetY || e.clientY - $(this).offset().top);
-
-                                var p = offsetToLocalPoint(offsetX, offsetY, $scope.paper);
                                 var newScale = V($scope.paper.viewport).scale().sx + delta;
 
                                 if (newScale > 0.4 && newScale < 2) {
-                                    $scope.paper.setOrigin(0, 0);
-                                    $scope.paper.scale(newScale, newScale, p.x, p.y);
+                                    $scope.paper.scale(newScale);
                                 }
                             });
 
@@ -67,6 +62,11 @@
                                     $scope.paper.setOrigin($scope.paper.options.origin.x - $scope.lastClientX + ($scope.lastClientX = e.clientX), $scope.paper.options.origin.y - $scope.lastClientY + ($scope.lastClientY = e.clientY));
                                 }
                             });
+
+                            $scope.paper.$el.on('mouseleave', function onMouseLeave(e) {
+                                $scope.pressed = 0;
+                            });
+
 
                         }
 
