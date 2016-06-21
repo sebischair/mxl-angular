@@ -35,7 +35,11 @@
   ],
   "dependencies": {
     "sc-angular": "master",
+    "jquery": "2.2.0",
     "lodash": "*",
+    "backbone": "*",
+    "dagre": "*",
+    "graphlib": "*",
     "joint": "*"
   }
 }
