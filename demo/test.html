@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>MxL Code editor demo</title>
+
+    <!-- ensure IE uses the latest version of IE (yes, yes...) -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- bower:css -->
+    <link rel="stylesheet" href="../bower_components/joint/dist/joint.css" />
+    <!-- endbower -->
+
+    <link rel="stylesheet" href="../bower_components/joint/dist/joint.core.css" />
+
+    <link rel="stylesheet" href="../src/directives/mxl-expression/mxl-expression.css" />
+    <link rel="stylesheet" href="../src/directives/mxl-model-view/mxl-model-view.css" />
+    <link rel="stylesheet" href="../src/third-party/code-mirror/codemirror.css" />
+    <link rel="stylesheet" href="../src/third-party/code-mirror/addon/display/fullscreen.css" />
+    <link rel="stylesheet" href="../src/third-party/code-mirror/addon/hint/show-hint.css" />
+    <link rel="stylesheet" href="../src/third-party/code-mirror/addon/lint/lint.css" />
+    
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+</head>
+<body ng-app="ceapp">
+   
+    <div ng-controller="testController" class="container">
+        <img sc-src="1svdxwkhcxqxh" />
+    </div>
+    <!-- bower:js -->
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../bower_components/ngstorage/ngStorage.js"></script>
+    <script src="../bower_components/angular-resource/angular-resource.js"></script>
+    <script src="../bower_components/lodash/lodash.js"></script>
+    <script src="../bower_components/sc-angular/dist/sc-angular.js"></script>
+    <script src="../bower_components/backbone/backbone.js"></script>
+    <script src="../bower_components/graphlib/dist/graphlib.core.js"></script>
+    <script src="../bower_components/dagre/dist/dagre.core.js"></script>
+    <script src="../bower_components/joint/dist/joint.core.js"></script>
+    <script src="../bower_components/joint/dist/joint.shapes.uml.js"></script>
+    <script src="../bower_components/joint/dist/joint.layout.DirectedGraph.js"></script>
+    <!-- endbower -->
+    
+    <!-- bootstrap -->
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <script src="../src/third-party/code-mirror/codemirror.js" type="text/javascript"></script>
+    <script src="../src/third-party/code-mirror/addon/display/fullscreen.js" type="text/javascript"></script>
+    <script src="../src/third-party/code-mirror/addon/display/panel.js" type="text/javascript"></script>
+    <script src="../src/third-party/code-mirror/addon/edit/closebrackets.js" type="text/javascript"></script>
+    <script src="../src/third-party/code-mirror/addon/edit/matchbrackets.js" type="text/javascript"></script>
+    <script src="../src/third-party/code-mirror/addon/hint/show-hint.js" type="text/javascript"></script>
+    <script src="../src/third-party/code-mirror/addon/lint/lint.js" type="text/javascript"></script>
+    <script src="../src/third-party/code-mirror/addon/runmode/runmode.js" type="text/javascript"></script>
+    <script src="../src/third-party/code-mirror/addon/search/match-highlighter.js" type="text/javascript"></script>
+    <script src="../src/third-party/code-mirror/addon/search/searchcursor.js" type="text/javascript"></script>
+    <script src="../src/bootstrap.js" type="text/javascript"></script>
+    <script src="../src/services/mxlUtil.js" type="text/javascript"></script>
+    <script src="../src/directives/mxl-expression/mxl-expression.directive.js" type="text/javascript"></script>
+    <script src="../src/directives/mxl-expression/mxl-hint.js" type="text/javascript"></script>
+    <script src="../src/directives/mxl-expression/mxl-lint.js" type="text/javascript"></script>
+    <script src="../src/directives/mxl-expression/mxl-parse.js" type="text/javascript"></script>
+    <script src="../src/directives/mxl-model-view/mxl-model-view.directive.js" type="text/javascript"></script>
+
+    <script src="demo.local.js" type="text/javascript"></script>  
+</body>
+</html>

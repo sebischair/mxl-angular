@@ -1,14 +1,19 @@
 ﻿var ceapp = angular.module('ceapp', ['sociocortex', 'mxl'])
     .value('scConnection', {
         baseUri: 'http://localhost:8083/intern/tricia',
-        apiVersion: 'v1'
+        apiVersion: 'v1',
+        authenticationMethod: 'jwt'
     });
 
-ceapp.controller('testController', function ($scope, scAuth) {
-    scAuth.login('mustermann@test.sc', 'ottto');
+ceapp.controller('testController', function ($scope, scAuth, scData) {
 
-    //$scope.expectedType = 'Number';
-    //$scope.mxlParameters = 'list:Sequence<Customer>, map:Function<Customer,Number>';
-    $scope.mxlValue = 'find Order.select(Customer.Turnover)';
-    $scope.workspaceId = 'northwind';
+    scAuth.login('mustermann@test.sc', 'ottto').then(function () {        
+        //$scope.expectedType = 'Number';
+        //$scope.mxlParameters = 'list:Sequence<Customer>, map:Function<Customer,Number>';
+
+        scData.Workspace.query(function (workspaces) {
+            $scope.workspaces = workspaces;
+        });
+
+    });
 });

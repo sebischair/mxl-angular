@@ -5,10 +5,21 @@
   "authors": [
     "Thomas Reschenhofer <thomas.reschenhofer@tum.de>"
   ],
-  "main": [ "dist/mxl-angular.js", "dist/mxl-angular.css" ],
+  "main": [
+    "dist/mxl-angular.js",
+    "dist/mxl-angular.css"
+  ],
   "overrides": {
-    "backbone": { "main": [ "backbone.js" ] },
-    "dagre": { "main": [ "dist/dagre.core.js" ] },
+    "backbone": {
+      "main": [
+        "backbone.js"
+      ]
+    },
+    "dagre": {
+      "main": [
+        "dist/dagre.core.js"
+      ]
+    },
     "joint": {
       "main": [
         "dist/joint.core.js",
@@ -41,5 +52,8 @@
     "dagre": "*",
     "graphlib": "*",
     "joint": "*"
+  },
+  "resolutions": {
+    "lodash": "4.13.1"
   }
 }
