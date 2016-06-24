@@ -11397,8 +11397,6 @@ CodeMirror.defineMIME("application/mxl", {
             require: ["^ngModel"],
             scope: {
                 mxlModelElements: '=ngModel',
-                width: '@width',
-                height: '@height',
                 orientation: '@orientation',
                 nodeSep: '@nodeSep',
                 edgeSep: '@edgeSep',
@@ -11417,11 +11415,11 @@ CodeMirror.defineMIME("application/mxl", {
 
                         if (!$scope.graph) {
                             $scope.graph = new joint.dia.Graph();
-
+                            
                             $scope.paper = new joint.dia.Paper({
                                 el: $element,
-                                width: $scope.width,
-                                height: $scope.height,
+                                width: $element[0].parentElement.clientWidth,
+                                height: $element[0].parentElement.clientHeight,
                                 gridSize: 1,
                                 model: $scope.graph,
                                 interactive: false,
